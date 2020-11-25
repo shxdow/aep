@@ -1,0 +1,92 @@
+https://cataas.com/#/about
+"""
+  - Compiler as a Service
+  - Binary instrumentation aaS
+  - Pokemon aaS
+
+  - Franz on mobile
+  - Date countdown (w/ Calendar integrations) aaS, mobile
+
+  - Preview on Windows / Linux
+  - PiP for every application
+  - ext4 driver (for real man only)
+"""
+
+- Petri nets simulation (one that doesn't suck ass)
+
+  - originalità: not 10B idea, def. a good one
+  - difficoltà (aka qualità):
+    - Idoneità funzionale: (?)
+    - Manutenibilità: tests, ...
+    - Affidabilità: fault-tolerance (?), web all'inizio, eventualmente offline first con electron
+    - Usabilità:
+    - Portabilità: web technologies supported by all major browsers
+    - Efficienza:
+    - Compatibilità: web technologies supported by all major browsers
+    - Sicurezza: https, normal sys admin stuff, API security, the usual...
+
+  - grading criteria:
+    - interdisciplinarietà: 10/10 - Modellazione, Progettazione, Simulazione, etc
+    - fondamenti teorici: 10/10 - Reti di Petri, metodi formali
+    - interesse potenziale (startup wen):
+    - dimensione (you gotta flex it): - 
+    - uso di librerie: irrelevant
+
+Cool stuff to use:
+  - http.cat to create error pages
+  - Travis CI
+  - Docker
+
+
+Tech stack:
+
+  - Markdown for all documentation
+  - Fabric.js: does everything
+  - Backend (get the one with the best tooling)
+    - Haskell
+    - Elixir
+
+      - creare un web server
+      - db access, auth
+      - unit test
+      - initial dev setup (package manager, ...)
+        - linter, highlight, ...
+      - static analyzer
+        + bonus points for profilers
+        + bonus points for web sockets
+
+  - Infrastructure
+    - Linux, Debian 10 (prod)
+      - create ssh accounts, give permissions
+      - install Docker
+
+  - db: just store as JSON, let the rest take care of itself
+  - doc generator
+
+
+Logistics:
+
+  start:      25/01
+  ideal:      31/12
+  deadline:   25/01
+
+  sprint duration: 3 - 5 days
+
+Pending:
+
+  - Gestione dei posti durante l'esecuzione della reti (front end)
+
+Steal from:
+
+  - https://jsplumbtoolkit.com/demonstration/flowchart-builder
+  - Solve the CORS issue: (cfr. mkcert to solve)
+
+Theory:
+
+  - Use a matrix to simulate, use a graph for formal verification
+    - Reachability
+    - Liveness
+    - Boundedness
+    - Check whether the PN is a State machine, free choice...
+
+  - https://www.techfak.uni-bielefeld.de/~mchen/BioPNML/Intro/MRPN.html
