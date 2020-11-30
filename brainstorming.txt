@@ -79,6 +79,7 @@ Pending:
 Steal from:
 
   - https://jsplumbtoolkit.com/demonstration/flowchart-builder
+  - https://stackoverflow.com/questions/17347216/how-to-use-fabric-js-to-do-visio-like-drawings-with-connections
   - Solve the CORS issue: (cfr. mkcert to solve)
 
 Theory:
