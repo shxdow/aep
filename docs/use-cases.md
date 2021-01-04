@@ -167,7 +167,7 @@
     1. L'amministratore elimina un operatore
     2. Il sistema aggiorna i dati in database segnando l'operatore come "eliminato"
   - **Situazioni eccezionali**: Nessuna
-  - **Postcondizioni**: L'operatore non risulta più visibile o modificabile
+  - **Postcondizioni**: L'operatore risulta eliminato
 
 - `A2`: *Assegnamento manuale del ticket*
   - **Descrizione**: Un amministratore assegna manualmente il ticket ad un gruppo di operatori

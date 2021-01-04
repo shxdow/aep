@@ -1,21 +1,39 @@
-# Funzionalità
+# Specifiche funzionali
 
-### Gestione account
+### Gestione account utente
 
-1. Creazione e gestione di un account usato dall'utente per l'inserimento di ticket e la comunicazione con gli operatori
-2. Login e logout per poter effettuare l'accesso al sito da parte di un utente
-
+1. **Creazione account**: inserimento dei dati relativi per la creazione dell'account utente
+2. **Gestione account**: modifica di vari dati dell'account utente (mail, nominativo, password)
+3. **Login/logout** da parte dell'utente
 ### Gestione ticket
 
-1. Creazione di un nuovo ticket da parte di un utente autenticato
-2. Creazione di un nuovo ticket in automatico tramite ricezione di mail e conseguente invio di mail di comunicazione
-3. Controllo dello stato del ticket da parte di un utente (sia autenticato sia non autenticato)
-4. Inserimento di commenti per la comunicazione da parte di un utente autenticato o di un operatore
-5. Cambio dello stato di un ticket da parte dell'operatore
-6. Assegnamento in automatico del ticket ad un gruppo di operatori da parte del sistema
-7. Assegnamento manuale del ticket ad un operatore da parte dell'amministratore
+1. **Creazione ticket tramite form**: inserimento di un nuovo ticket da parte di un utente autenticato
+2. **Creazione ticket tramite mail**: inserimento automatico di un nuovo ticket tramite invio di una mail
+3. **Controllo stato ticket**: un utente visualizza lo stato di un proprio ticket
+4. **Inserimento commenti**: inserimento di commenti su un ticket per la comunicazione da parte di un utente autenticato o di un operatore
+5. **Gestione stato ticket**: un operatore cambia lo stato del ticket
+6. **Assegnamento automatico ticket** ad un gruppo di operatori da parte del sistema
+7. **Assegnamento manuale ticket** ad un gruppo di operatore da parte dell'amministratore
 
 ### Gestione operatori
 
-1. Inserimento, modifica ed eliminazione di operatori da parte di un utente amministratore
+1. **Creazione operatore**: l'amministratore inserisce un nuovo operatore
+2. **Modifica operatore**: l'amministratore modifica i dati di un operatore
+3. **Eliminazione operatore**: l'amministratore elimina un operatore
 
+### Riassunto
+
+| Codice | Nome                          |
+| ------ | ----------------------------- |
+| `FU1`  | Creazione account             |
+| `FU2`  | Gestione account              |
+| `FT1`  | Creazione ticket tramite form |
+| `FT2`  | Creazione ticket tramite mail |
+| `FT3`  | Controllo stato ticket        |
+| `FT4`  | Inserimento commenti          |
+| `FT5`  | Gestione stato ticket         |
+| `FT6`  | Assegnameto automatico ticket |
+| `FT7`  | Assegnameto manuale ticket    |
+| `FO1`  | Creazione operatore           |
+| `FO2`  | Modifica operatore            |
+| `FO3`  | Eliminazione operatore        |
