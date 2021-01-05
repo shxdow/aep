@@ -187,7 +187,3 @@
   - **Passi principali**: Nessuno
   - **Situazioni eccezionali**: Nessuna
   - **Postcondizioni**: Il ticket risulta assegnato ad un gruppo di operatori
-
-### Diagramma casi d'uso
-
-<img src="./use-cases-uml.png" style="zoom:75%">
