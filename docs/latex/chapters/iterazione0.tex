@@ -14,6 +14,47 @@ TODO: Elenco dei casi d'uso
 
 \subsection{Requisiti funzionali}
 
+Di seguito è presente l'elenco completo di tutte le specifiche funzionali necessarie
+al fine della realizzazione del software:
+
+\begin{enumerate}
+  \item \textit{Creazione di un account}, ovvero l'inserimento dei dati relativi per la creazione di un account utente (tra cui nome, password ed email);
+  \item \textit{Gestione dell'account}, ovvero la modifica delle informazioni dell'account utente;
+  \item \textit{Login} e \textit{logout} di utenti ed operatori;
+  \item \textit{Creazione di ticket tramite form} da parte di un utente autenticato;
+  \item \textit{Creazione di ticket tramite mail} da parte del sistema;
+  \item \textit{Controllo dello stato del ticket}, sia con informazioni aggiuntive (per utenti autenticati) sia senza di esse (per utenti non autenticati);
+  \item \textit{Assegnamento automatico del ticket} da parte del sistema ad un gruppo di operatori;
+  \item \textit{Assegnamento manuale del ticket} da parte dell'amministratore ad un gruppo di operatori;
+  \item \textit{Creazione, modifica ed eliminazione di operatori} da parte dell'amministratore.
+\end{enumerate}
+
+Tutte queste funzionalità sono visibili riassunte nella tabella \ref{tab:requisiti-funzionali}.
+
+\begin{table}
+  \centering
+  \begin{tabular}{|l|l|}
+    \hline
+    Codice & Descrizione \\
+    \hline
+    \hline \texttt{FU1} & Creazione account             \\
+    \hline \texttt{FU2} & Gestione account              \\
+    \hline \texttt{FT1} & Creazione ticket tramite form \\
+    \hline \texttt{FT2} & Creazione ticket tramite mail \\
+    \hline \texttt{FT3} & Controllo stato ticket        \\
+    \hline \texttt{FT4} & Inserimento commenti          \\
+    \hline \texttt{FT5} & Gestione stato ticket         \\
+    \hline \texttt{FT6} & Assegnameto automatico ticket \\
+    \hline \texttt{FT7} & Assegnameto manuale ticket    \\
+    \hline \texttt{FO1} & Creazione operatore           \\
+    \hline \texttt{FO2} & Modifica operatore            \\
+    \hline \texttt{FO3} & Eliminazione operatore        \\
+    \hline
+  \end{tabular}
+  \caption{Requisiti funzionali}
+  \label{tab:requisiti-funzionali}
+\end{table}
+
 \section{Architettura software}
 
 \subsection{Component Diagram}
