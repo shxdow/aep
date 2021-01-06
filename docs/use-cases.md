@@ -146,18 +146,7 @@
     2. L'amministratore salva i nuovi dati
     3. Il sistema modifica i dati in database
   - **Situazioni eccezionali**: Nessuna
-  - **Postcondizioni**: Il nuovo operatore risulta aggiornato
-
-- `A1.2`: *Gestione operatori - modifica*
-  - **Descrizione**: Un amministratore modifica un nuovo operatore
-  - **Attori**: Amministratore
-  - **Precondizioni**: L'amministratore deve aver effettuato il login
-  - **Passi principali**
-    1. L'amministratore modifica i dati del nuovo operatore
-    2. L'amministratore salva i nuovi dati
-    3. Il sistema modifica i dati in database
-  - **Situazioni eccezionali**: Nessuna
-  - **Postcondizioni**: L'operatore risulta aggiornato
+  - **Postcondizioni**: l'operatore risulta aggiornato
 
 - `A1.3`: *Gestione operatori - elimina*
   - **Descrizione**: Un amministratore elimina un nuovo operatore

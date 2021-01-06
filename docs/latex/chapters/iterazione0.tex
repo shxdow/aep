@@ -3,14 +3,253 @@
 \section{Specifiche}
 \subsection{Casi d'uso}
 
-TODO: Elenco dei casi d'uso
+\subsubsection{Attori}
+Gli attori che devono utilizzare il sistema sono:
+
+\begin{itemize}
+  \item \textit{Utente registrato}: un utente esterno all'azienda che si è registrato al portale per la gestione dei ticket;
+  \item \textit{Utente non registrato}: un qualsiasi utente esterno all'azienda che non si è registrato al portale;
+  \item \textit{Operatore}: un dipendente dell'azienda registrato nel sistema di gestione dei ticket;
+  \item \textit{Amministratore}: un dipendente dell'azienda registrato, con compiti di gestione.
+\end{itemize}
+
+\subsubsection{Elenco dei casi d'uso}
+Nella Tabella \ref{tab:casi-uso} vengono descritti i casi d'uso individuati con i rispettivi codici, mentre il diagramma UML dei casi d'uso è in Figura \ref{fig:diag-use-cases}.
+
+\begin{table}
+  \centering
+  \begin{tabular}{l|m{12cm}|}
+    \hline
+    Codice & Descrizione \\
+    \hline
+    \hline \texttt{U1} & Un utente registrato crea un nuovo ticket da form                                                                      \\
+    \hline \texttt{U2} & Un utente non registrato crea un nuovo ticket inviando una mail                                                        \\
+    \hline \texttt{U3} & Un utente (sia registrato sia non registrato) può controllare lo stato del ticket                                      \\
+    \hline \texttt{U4} & Un utente registrato può usare il portale per comunicare (inserendo dei commenti) con l'operatore assegnato al ticket  \\
+    \hline \texttt{U5} & Un utente crea e gestisce l'account                                                                                    \\
+    \hline \texttt{S1} & Il sistema assegna in automatico un nuovo ticket ad un gruppo di operatori o ad un operatore specifico                 \\
+    \hline \texttt{S2} & Il sistema fornisce una mail ad un utente non registrato per poter comunicare con l'operatore                          \\
+    \hline \texttt{O1} & Un operatore può cambiare lo stato del ticket (aperto/chiuso/assegnato/in corso)                                       \\
+    \hline \texttt{O2} & Un operatore può inserire commenti sui ticket a cui è assegnato                                                        \\
+    \hline \texttt{A1.1} & Un amministratore interno all'azienda inserisce un nuovo operatore                                                   \\
+    \hline \texttt{A1.2} & Un amministratore interno all'azienda modifica un operatore                                                          \\
+    \hline \texttt{A1.3} & Un amministratore interno all'azienda elimina un operatore                                                           \\
+    \hline \texttt{A2} & Un amministratore interno all'azienda assegna manualmente i ticket ad un operatore specifico                           \\
+    \hline \texttt{G1} & Caso d'uso generico che rappresenta l'inserimento di un ticket                                                         \\
+    \hline
+  \end{tabular}
+  \caption{Casi d'uso}
+  \label{tab:casi-uso}
+\end{table}
+
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{use-cases-uml.png}
-  \caption{Diagramma UML dei casi d'usi}
+  \caption{Diagramma UML dei casi d'uso}
   \label{fig:diag-use-cases}
 \end{figure}
+
+\subsubsection{Dettaglio dei casi d'uso}
+Nel seguente elenco puntanto, verranno analizzati in maniera più dettagliata tutti i casi d'uso, identificandone descrizione, attori, precondizioni, passi principali, situazioni
+eccezionali e postcondizioni. 
+
+\begin{itemize}
+  \item \textbf{U1}: \textit{Inserimento ticket via form}
+    \begin{itemize}
+      \item \textbf{Descrizione}: l'utente desidera creare un nuovo ticket tramite form web;
+      \item \textbf{Attori}: utente;
+      \item \textbf{Precondizioni}: l'utente ha effettuato il login e si trova nel form di creazione ticket;
+      \item \textbf{Passi principali}: 
+        \begin{enumerate}
+          \item L'utente inserisce titolo e descrizione del ticket;
+          \item L'utente crea il nuovo ticket;
+          \item Il sistema inserisce il nuovo ticket in database;
+          \item Il sistema assegna in automatico il ticket (S1).
+        \end{enumerate}
+      \item \textbf{Situazioni eccezionali}: nessuna;
+      \item \textbf{Postcondizioni}: il ticket è inserito in un database.
+    \end{itemize}
+  \item \textbf{U2}: \textit{Inserimento ticket via mail}
+    \begin{itemize}
+      \item \textbf{Descrizione}: l'utente desidera creare un nuovo ticket tramite email;
+      \item \textbf{Attori}: utente;
+      \item \textbf{Precondizioni}: nessuna;
+      \item \textbf{Passi principali}: 
+        \begin{enumerate}
+          \item L'utente invia una mail al sistema di ticketing;
+          \item Il sistema inserisce i dati in database;
+          \item Il sistema genera una mail di comunicazione (S2);
+          \item L'utente viene notificato dal sistema dell'avvenuta ricezione.
+        \end{enumerate}
+      \item \textbf{Situazioni eccezionali}: nessuna;
+      \item \textbf{Postcondizioni}: il ticket è inserito in un database.
+    \end{itemize}
+  \item \textbf{U3}: \textit{Controllo stato ticket}
+    \begin{itemize}
+      \item \textbf{Descrizione}: l'utente controlla lo stato del ticket (aperto/assegnato/in corso/chiuso);
+      \item \textbf{Attori}: utente;
+      \item \textbf{Precondizioni}: l'utente conosce l'identificativo del ticket;
+      \item \textbf{Passi principali}: 
+        \begin{enumerate}
+          \item L'utente naviga alla pagina di stato dello specifico ticket;
+          \item Il sistema invia all'utente le varie informazioni sul ticket, tra cui titolo, descrizione e stato;
+        \end{enumerate}
+      \item \textbf{Situazioni eccezionali}: se il ticket è stato inviato tramite mail, è visibile solamente lo stato del ticket;
+      \item \textbf{Postcondizioni}: nessuna.
+    \end{itemize}
+  \item \textbf{U4}: \textit{Inserimento di commenti sul ticket}
+    \begin{itemize}
+      \item \textbf{Descrizione}: l'utente inserisce un commento in un ticket già aperto;
+      \item \textbf{Attori}: utente;
+      \item \textbf{Precondizioni}: l'utente deve aver effettuato il login ed il ticket deve esistere;
+      \item \textbf{Passi principali}: 
+        \begin{enumerate}
+          \item L'utente inserisce un nuovo commento;
+          \item L'utente salva il commento;
+          \item Il sistema inserisce il commento in database.
+        \end{enumerate}
+      \item \textbf{Situazioni eccezionali}: se il ticket è assegnato ad un operatore, l'operatore viene notificato;
+      \item \textbf{Postcondizioni}: il commento è inserito in database.
+    \end{itemize}
+  \item \textbf{U5}: \textit{Gestione account}
+    \begin{itemize}
+      \item \textbf{Descrizione}: l'utente modifica i dati inseriti in fase di registrazione;
+      \item \textbf{Attori}: utente;
+      \item \textbf{Precondizioni}: l'utente deve aver effettuato il login;
+      \item \textbf{Passi principali}: 
+        \begin{enumerate}
+          \item L'utente inserisce i nuovi dati da aggiornare;
+          \item L'utente salva i nuovi dati;
+          \item Il sistema riceve i dati e aggiorna le informazioni in database.
+        \end{enumerate}
+      \item \textbf{Situazioni eccezionali}: nessuna;
+      \item \textbf{Postcondizioni}: il ticket viene inserito in database dal sistema.
+    \end{itemize}
+  \item \textbf{S1}: \textit{Assegnamento automatico del ticket}
+    \begin{itemize}
+      \item \textbf{Descrizione}: il ticket è assegnato automaticamente ad un gruppo;
+      \item \textbf{Attori}: nessuno;
+      \item \textbf{Precondizioni}: il sistema ha ricevuto e inserito in database un nuovo ticket;
+      \item \textbf{Passi principali}: 
+        \begin{enumerate}
+          \item Il sistema valuta il miglior gruppo a cui assegnare il ticket sulla base delle informazioni presenti in database;
+          \item Il sistema aggiorna le informazioni in database di conseguenza;
+          \item Il sistema notifica il corrispondente gruppo di operatori.
+        \end{enumerate}
+      \item \textbf{Situazioni eccezionali}: il ticket può non essere assegnato se non sono presenti abbastanza informazioni;
+      \item \textbf{Postcondizioni}: il ticket è assegnato ad un gruppo di operatori.
+    \end{itemize}
+  \item \textbf{S2}: \textit{Generazione mail di comunicazione}
+    \begin{itemize}
+      \item \textbf{Descrizione}: il sistema genera una mail che comunica all'utente per la comunicazione con gli operatori;
+      \item \textbf{Attori}: nessuno;
+      \item \textbf{Precondizioni}: il sistema ha ricevuto e inserito in database un nuovo ticket;
+      \item \textbf{Passi principali}: 
+        \begin{enumerate}
+          \item Il sistema genera un indirizzo mail per le comunicazioni sullo specifico ticket;
+          \item Il sistema comunica all'utente questo indirizzo mail.
+        \end{enumerate}
+      \item \textbf{Situazioni eccezionali}: nessuna;
+      \item \textbf{Postcondizioni}: l'utente è in possesso di una mail per la comunicazione con gli operatori.
+    \end{itemize}
+  \item \textbf{O1}: \textit{Gestione stato ticket}
+    \begin{itemize}
+      \item \textbf{Descrizione}: l'operatore cambia lo stato del ticket;
+      \item \textbf{Attori}: operatore;
+      \item \textbf{Precondizioni}: il ticket deve esistere in database e dev'essere stato assegnato, l'operatore deve aver effettuato il login;
+      \item \textbf{Passi principali}: 
+        \begin{enumerate}
+          \item L'operatore modifica lo stato del ticket;
+          \item Il sistema aggiorna lo stato del ticket in database;
+          \item Il sistema notifica l'utente dell'avvenuto cambiamento di stato.
+        \end{enumerate}
+      \item \textbf{Situazioni eccezionali}: nessuna;
+      \item \textbf{Postcondizioni}: il ticket ha il nuovo stato e l'utente è stato avvisato.
+    \end{itemize}
+  \item \textbf{O2}: \textit{Inserimento di commenti sul ticket}
+    \begin{itemize}
+      \item \textbf{Descrizione}: un operatore aggiunge commenti su uno specifico ticket;
+      \item \textbf{Attori}: operatore;
+      \item \textbf{Precondizioni}: il ticket deve esistere in database e dev'essere stato assegnato, l'operatore deve aver effettuato il login;
+      \item \textbf{Passi principali}: 
+        \begin{enumerate}
+          \item L'operatore inserisce un nuovo commento;
+          \item L'operatore salva il commento;
+          \item Il sistema inserisce il commento in database;
+          \item Il sistema notifica l'utente dell'avvenuto inserimento del commento.
+        \end{enumerate}
+      \item \textbf{Situazioni eccezionali}: nessuna;
+      \item \textbf{Postcondizioni}: il commento è inserito in database.
+    \end{itemize}
+  \item \textbf{A1.1}: \textit{Gestione operatori - inserimento}
+    \begin{itemize}
+      \item \textbf{Descrizione}: un amministratore inserisce un nuovo operatore;
+      \item \textbf{Attori}: amministratore;
+      \item \textbf{Precondizioni}: l'amministratore deve aver effettuato il login;
+      \item \textbf{Passi principali}: 
+        \begin{enumerate}
+          \item L'amministratore inserisce i dati del nuovo operatore;
+          \item L'amministratore salva i nuovi dati;
+          \item Il sistema inserisce i dati in database.
+        \end{enumerate}
+      \item \textbf{Situazioni eccezionali}: nessuna;
+      \item \textbf{Postcondizioni}: il nuovo operatore risulta inserito.
+    \end{itemize}
+  \item \textbf{A1.2}: \textit{Gestione operatori - modifica}
+    \begin{itemize}
+      \item \textbf{Descrizione}: un amministratore modifica un operatore;
+      \item \textbf{Attori}: amministratore;
+      \item \textbf{Precondizioni}: l'amministratore deve aver effettuato il login;
+      \item \textbf{Passi principali}: 
+        \begin{enumerate}
+          \item L'amministratore modifica i dati dell'operatore;
+          \item L'amministratore salva i nuovi dati;
+          \item Il sistema modifica i dati in database.
+        \end{enumerate}
+      \item \textbf{Situazioni eccezionali}: nessuna;
+      \item \textbf{Postcondizioni}: l'operatore risulta aggiornato.
+    \end{itemize}
+  \item \textbf{A1.3}: \textit{Gestione operatori - elimina}
+    \begin{itemize}
+      \item \textbf{Descrizione}: un amministratore elimina un operatore;
+      \item \textbf{Attori}: amministratore;
+      \item \textbf{Precondizioni}: l'amministratore deve aver effettuato il login;
+      \item \textbf{Passi principali}: 
+        \begin{enumerate}
+          \item L'amministratore elimina un operatore;
+          \item Il sistema aggiorna i dati in database segnando l'operatore come "eliminato".
+        \end{enumerate}
+      \item \textbf{Situazioni eccezionali}: nessuna;
+      \item \textbf{Postcondizioni}: l'operatore risulta eliminato.
+    \end{itemize}
+  \item \textbf{A2}: \textit{Assegnamento manuale del ticket}
+    \begin{itemize}
+      \item \textbf{Descrizione}: un amministratore assegna manualmente il ticket ad un gruppo di operatori;
+      \item \textbf{Attori}: amministratore;
+      \item \textbf{Precondizioni}: l'amministratore deve aver effettuato il login;
+      \item \textbf{Passi principali}: 
+        \begin{enumerate}
+          \item L'amministratore cambia i dati del ticket inserendo il gruppo a cui assegnarlo;
+          \item L'amministratore salva i dati;
+          \item Il sistema modifica i dati in database
+        \end{enumerate}
+      \item \textbf{Situazioni eccezionali}: nessuna;
+      \item \textbf{Postcondizioni}: il ticket risulta assegnato al gruppo specificato.
+    \end{itemize}
+  \item \textbf{G1}: \textit{Assegnamento del ticket}
+    \begin{itemize}
+      \item \textbf{Descrizione}: caso d'uso generico che rappresenta l'assegnamento di un ticket ad un gruppo di operatori;
+      \item \textbf{Attori}: nessuno;
+      \item \textbf{Precondizioni}: nessuna;
+      \item \textbf{Passi principali}: nessuno;
+      \item \textbf{Situazioni eccezionali}: nessuna;
+      \item \textbf{Postcondizioni}: il ticket risulta assegnato ad un gruppo di operatori.
+    \end{itemize}
+\end{itemize}
+
+
+
 
 \subsection{Requisiti funzionali}
 
@@ -29,7 +268,7 @@ al fine della realizzazione del software:
   \item \textit{Creazione, modifica ed eliminazione di operatori} da parte dell'amministratore.
 \end{enumerate}
 
-Tutte queste funzionalità sono visibili riassunte nella tabella \ref{tab:requisiti-funzionali}.
+Tutte queste funzionalità sono visibili riassunte nella Tabella \ref{tab:requisiti-funzionali}.
 
 \begin{table}
   \centering
