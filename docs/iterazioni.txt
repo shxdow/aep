@@ -1,0 +1,43 @@
+Iterazione 0
+  - Progettazione
+
+Iterazione 1 - Est. ~ 4 hrs (10/01 - 11/01)
+
+  - Creazione infrastruttura
+    - Database - 1h
+      - ER
+    - Admin panel - 0m
+    - Fine-grained access controls - 3h
+      - Unit testing - 1h
+  - Dockerization (Optional)
+  - Writing docs - 2h30m
+
+
+Iterazione 2 Est. ~ 4h (12/01 - 13/01)
+
+  - Gestione ticket - 
+    - Cambi di stato - 15m
+    - Commenti - 15m
+    - Visualizzazione (anche per utenti non loggati) - 30m
+      - Indicando solamente lo stato
+  - Writing docs - 2h30m
+
+Iterazione 3 Est. - (14/01 - 18/01)
+ 
+  - Classifier 
+    - Implementaer k-means
+    - Stima del tempo di risoluzione del ticket
+      - AR
+  - Writing docs - 2h30m
+
+Iterazione 4 Est. ( - 19/01)
+
+  - Creazione ticket da email - 1h to 5h
+  - Invio email di notifica - 1h
+  - Writing docs - max(2h30m)
+
+Iterazione 5
+
+  - Electron (optional) - 30s
+  - Closing notes - 2h
+
