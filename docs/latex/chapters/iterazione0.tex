@@ -11,6 +11,26 @@ ed una migliore organizzazione di informazioni.
 Questo assegnamento automatico è effettuato tramite tecniche di classificazione non supervisionate, come ad esempio \textit{k-means},
 che analizzano solamente i dati che definiscono un ticket.
 
+\section{Analisi dei requisiti}
+
+\subsection{Analisi del contesto}
+
+La gestione dei ticket, seppur necessaria e fondamentale per un'azienda, può rappresentare
+un costo in termini sia di risorse sia di tempo, in quanto il ticket dev'essere letto, compreso e
+smistato per poterlo indirizzare alla persona (o gruppo di persone) più in grado di risolvere il problema.
+
+Il processo di evasione dei ticket rappresenta dunque un costo ulteriore che può diminuire l'efficienza
+dei processi aziendali.
+
+\subsection{Studio di fattibilità}
+
+Un sistema per l'assegnamento automatico che si basa su metodi non supervisionati può ridurre i costi definiti alla sezione precedente.
+Per realizzare questa funzionalità bisogna quindi implementare un algoritmo di classificazione che, estraendo opportune
+informazioni dal contenuto di un ticket, provvede alla sua classificazione in più gruppi definiti dall'azienda stessa.
+
+I costi principali relativi alla soluzione sono legati allo sviluppo del software
+e alla manutenzione del server per l'\textit{hosting} del sistema.
+
 \section{Specifiche}
 
 In questa sezione sono presenti le varie specifiche che definiscono la struttura ed il comportamento del sistema.
