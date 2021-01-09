@@ -1,6 +1,20 @@
 \section{Introduzione}
 
+In ambito aziendale è solito avere un sistema cosiddetto di \textit{ticketing} per il tracciamento e la risoluzione di problemi,
+principalmente relativi ai prodotti software venduti, tra i dipendenti dell'azienda stessa e gli utenti utilizzatori.
+Questa gestione consente di tenere traccia dell'evoluzione della comunicazione e dei vari passi risolutivi che portano alla
+chiusura del ticket ed alla sistemazione di eventuali bug e regressioni.
+
+Il sistema di \textit{ticketing} da noi realizzato implementa tutte le funzionalità comunemente presenti negli altri sistemi,
+ma si differenzia per via dell'assegnamento automatico dei ticket aperti a varie unità organizzative per un miglior filtraggio
+ed una migliore organizzazione di informazioni.
+Questo assegnamento automatico è effettuato tramite tecniche di classificazione non supervisionate, come ad esempio \textit{k-means},
+che analizzano solamente i dati che definiscono un ticket.
+
 \section{Specifiche}
+
+In questa sezione sono presenti le varie specifiche che definiscono la struttura ed il comportamento del sistema.
+
 \subsection{Casi d'uso}
 
 Nelle seguenti sezioni sono analizzati gli attori ed i casi d'uso che definiscono il comportamento del sistema.
