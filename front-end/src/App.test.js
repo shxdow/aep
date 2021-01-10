@@ -49,3 +49,15 @@ test('has a 404 page', () => {
 
   expect(screen.getByText(/404/i)).toBeInTheDocument();
 });
+
+test('has a ticket list page', () => {
+  const history = createMemoryHistory();
+  history.push('/tickets');
+  render(
+    <Router history={history}>
+      <AppRouting />
+    </Router>
+  );
+
+  expect(screen.getByText(/elenco ticket/i)).toBeInTheDocument();
+});

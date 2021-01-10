@@ -22,7 +22,7 @@ const TopBar = ({ title }) => {
       <Nav className="ml-auto mr-2">
         <Navbar.Text>{username}</Navbar.Text>
         <Nav.Link onClick={logout}>
-          <i title="Esci" className="fas fa-sign-out-alt" />
+          <i title="Logout" className="fas fa-sign-out-alt" />
         </Nav.Link>
       </Nav>
     </Navbar>

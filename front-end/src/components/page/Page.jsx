@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Menu from './menu';
-import TopBar from './top-bar';
+import TopBar from './TopBar';
 
 const contentStyle = { height: '100%' };
 const containerStyle = { height: '100%', overflowY: 'scroll' };

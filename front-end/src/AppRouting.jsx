@@ -4,11 +4,13 @@ import { Switch, Route } from 'react-router-dom';
 import Account from './scenes/account';
 import Home from './scenes/home';
 import NotFound from './scenes/NotFound';
+import TicketList from './scenes/ticket-list';
 
 const AppRouting = () => (
   <Switch>
     <Route exact path="/" component={Home} />
     <Route exact path="/account" component={Account} />
+    <Route exact path="/tickets" component={TicketList} />
 
     <Route path="/" component={NotFound} />
   </Switch>
