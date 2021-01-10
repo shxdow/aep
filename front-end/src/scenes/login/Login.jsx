@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, Form, Button, Col, Image, Alert } from 'react-bootstrap';
 
 import BackgroundImage from '../../resources/login.jpeg';
 
 import validate from './validation.login';
 
-const Login = ({ history }) => {
+const Login = () => {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
@@ -109,6 +110,9 @@ const Login = ({ history }) => {
                         >
                           {`Login${loading ? ' ...' : ''}`}
                         </Button>
+                      </div>
+                      <div className="p-3 text-center">
+                        <Link to="/account/new">Nuovo account</Link>
                       </div>
                     </Form>
                   </Col>
