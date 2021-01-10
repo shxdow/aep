@@ -10,3 +10,8 @@
 *.run.xml
 *.out
 *.dvi
+
+# Front end stuff
+node_modules
+.eslintcache
+front-end/build
