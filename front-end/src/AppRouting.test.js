@@ -10,7 +10,7 @@ import AppRouting from './AppRouting';
 const renderWithRoute = (route) => {
   const history = createMemoryHistory();
   history.push(route);
-  render(
+  return render(
     <Router history={history}>
       <AppRouting />
     </Router>
@@ -45,4 +45,9 @@ test('has a ticket creation page', () => {
 test('has a ticket info page', () => {
   renderWithRoute('/tickets/1234');
   expect(screen.getByText(/informazioni ticket 1234/i)).toBeInTheDocument();
+});
+
+test('has a login page', () => {
+  renderWithRoute('/login');
+  expect(screen.getByText(/inserisci le tue credenziali/i)).toBeInTheDocument();
 });
