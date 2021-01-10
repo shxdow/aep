@@ -12,6 +12,6 @@
 *.dvi
 
 # Front end stuff
-node_modules
-.eslintcache
+front-end/node_modules
+front-end/.eslintcache
 front-end/build
