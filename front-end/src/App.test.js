@@ -73,3 +73,15 @@ test('has a ticket creation page', () => {
 
   expect(screen.getByText(/creazione nuovo ticket/i)).toBeInTheDocument();
 });
+
+test('has a ticket info page', () => {
+  const history = createMemoryHistory();
+  history.push('/tickets/1234');
+  render(
+    <Router history={history}>
+      <AppRouting />
+    </Router>
+  );
+
+  expect(screen.getByText(/informazioni ticket 1234/i)).toBeInTheDocument();
+});
