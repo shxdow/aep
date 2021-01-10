@@ -18,14 +18,19 @@ const renderWithRoute = (route) => {
 };
 
 describe('App routing', () => {
-  it('has a home route', () => {
+  it('has a home page', () => {
     renderWithRoute('/');
     expect(screen.getByText(/home/i)).toBeInTheDocument();
   });
 
-  it('has an account route', () => {
+  it('has an account page', () => {
     renderWithRoute('/account');
     screen.getAllByText(/account/i).forEach((x) => expect(x).toBeInTheDocument());
+  });
+
+  it('has a registration page', () => {
+    renderWithRoute('/account/new');
+    expect(screen.getByText(/nuovo account/i)).toBeInTheDocument();
   });
 
   it('has a 404 page', () => {
