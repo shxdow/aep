@@ -7,6 +7,7 @@ import { Router } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 
 import App from './App';
+import AppRouting from './AppRouting';
 
 test('renders without crashing', () => {
   const div = document.createElement('div');
@@ -18,7 +19,7 @@ test('has a home route', () => {
   history.push('/');
   render(
     <Router history={history}>
-      <App />
+      <AppRouting />
     </Router>
   );
 
@@ -30,9 +31,21 @@ test('has an account route', () => {
   history.push('/account');
   render(
     <Router history={history}>
-      <App />
+      <AppRouting />
     </Router>
   );
 
   screen.getAllByText(/account/i).forEach((x) => expect(x).toBeInTheDocument());
+});
+
+test('has a 404 page', () => {
+  const history = createMemoryHistory();
+  history.push('/some/random/page');
+  render(
+    <Router history={history}>
+      <AppRouting />
+    </Router>
+  );
+
+  expect(screen.getByText(/404/i)).toBeInTheDocument();
 });
