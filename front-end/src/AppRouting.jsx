@@ -10,15 +10,20 @@ import TicketList from './scenes/ticket-list';
 import TicketNew from './scenes/ticket-new';
 import Registration from './scenes/registration';
 
+import withAuth from './withAuth';
+
+const AuthRoute = ({ component, ...props }) => <Route {...props} component={withAuth(component)} />;
+
 const AppRouting = () => (
   <Switch>
-    <Route exact path="/" component={Home} />
-    <Route exact path="/account" component={Account} />
+    <AuthRoute exact path="/" component={Home} />
+    <AuthRoute exact path="/account" component={Account} />
+    <AuthRoute exact path="/tickets" component={TicketList} />
+    <AuthRoute exact path="/tickets/new" component={TicketNew} />
+    <AuthRoute exact path="/tickets/:ticketId" component={TicketInfo} />
+
     <Route exact path="/account/new" component={Registration} />
     <Route exact path="/login" component={Login} />
-    <Route exact path="/tickets" component={TicketList} />
-    <Route exact path="/tickets/new" component={TicketNew} />
-    <Route exact path="/tickets/:ticketId" component={TicketInfo} />
 
     <Route path="/" component={NotFound} />
   </Switch>

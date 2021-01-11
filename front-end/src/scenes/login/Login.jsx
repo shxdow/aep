@@ -1,24 +1,28 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import Cookies from 'js-cookie';
+import { Link, useHistory } from 'react-router-dom';
 import { Card, Form, Button, Col, Image, Alert } from 'react-bootstrap';
 
 import BackgroundImage from '../../resources/login.jpeg';
 
 import validate from './validation.login';
+import * as actions from './actions.login';
 
 const Login = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [error, setError] = useState('');
+  const history = useHistory();
 
   useEffect(() => {
-    // TODO: check if logged in
-    setLoading(false);
-    setError('');
-  }, []);
+    if (Cookies.get('token')) {
+      history.push('/');
+      return;
+    }
+  }, [history]);
 
   const updateUsername = useCallback((e) => {
     setUsername(e.target.value);
@@ -40,10 +44,16 @@ const Login = () => {
       }
 
       setLoading(true);
-      // TODO: Login
-      setLoading(false);
+      try {
+        await actions.login(username, password);
+        setLoading(false);
+        history.push('/');
+      } catch (e) {
+        setError(e.message);
+        setLoading(false);
+      }
     },
-    [username, password]
+    [username, password, history]
   );
 
   if (loading) {

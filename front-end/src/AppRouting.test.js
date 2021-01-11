@@ -1,4 +1,5 @@
 import React from 'react';
+import Cookies from 'js-cookie';
 import { render, screen } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
@@ -7,7 +8,12 @@ import '@testing-library/jest-dom/extend-expect';
 
 import AppRouting from './AppRouting';
 
-const renderWithRoute = (route) => {
+const renderWithRoute = (route, withoutToken = false) => {
+  if (withoutToken) {
+    Cookies.remove('token');
+  } else {
+    Cookies.set('token', 'test_token');
+  }
   const history = createMemoryHistory();
   history.push(route);
   return render(
@@ -54,7 +60,7 @@ describe('App routing', () => {
   });
 
   it('has a login page', () => {
-    renderWithRoute('/login');
+    renderWithRoute('/login', true);
     expect(screen.getByText(/inserisci le tue credenziali/i)).toBeInTheDocument();
   });
 });

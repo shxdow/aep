@@ -21,11 +21,3 @@ Esegue i test.
 
 Compila la app per la produzione nella cartella `build`.\
 La build è minificata ed i nomi dei file includono l'hash.
-
-## Environment
-
-Per far funzionare le chiamate al server è necessario creare un file `.env` in questa cartella
-il cui contenuto segue questo formato:
-```
-SERVER_ADDRESS=https://your.serveraddress.com:port
-```
