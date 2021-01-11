@@ -1,9 +1,6 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+require('dotenv').config();
 
-import './index.css';
-import './theme/sb-admin-2.min.css';
-import './theme/fontawesome-free/css/all.min.css';
-import App from './App';
+const ReactDOM = require('react-dom');
+const App = require('./App');
 
 ReactDOM.render(<App />, document.getElementById('root'));

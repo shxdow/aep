@@ -9,4 +9,8 @@ describe('App', () => {
   it('renders without crashing', () => {
     render(<App />);
   });
+
+  it('has loaded the .env environment file', () => {
+    expect(process.env.SERVER_ADDRESS).not.toBeFalsy();
+  });
 });
