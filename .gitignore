@@ -149,3 +149,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+# Front end stuff
+front-end/node_modules
+front-end/.eslintcache
+front-end/build
