@@ -21,3 +21,10 @@ Esegue i test.
 
 Compila la app per la produzione nella cartella `build`.\
 La build è minificata ed i nomi dei file includono l'hash.
+
+## Environment
+
+Creare nella cartella `src` un file `.env` con il seguente formato.
+```
+global.SERVER_ADDRESS = 'http://your.server.com:port'
+```
