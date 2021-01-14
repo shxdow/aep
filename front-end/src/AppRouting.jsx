@@ -8,7 +8,6 @@ import NotFound from './scenes/NotFound';
 import TicketInfo from './scenes/ticket-info';
 import TicketList from './scenes/ticket-list';
 import TicketNew from './scenes/ticket-new';
-import Registration from './scenes/registration';
 
 import withAuth from './withAuth';
 
@@ -22,7 +21,6 @@ const AppRouting = () => (
     <AuthRoute exact path="/tickets/new" component={TicketNew} />
     <AuthRoute exact path="/tickets/:ticketId" component={TicketInfo} />
 
-    <Route exact path="/account/new" component={Registration} />
     <Route exact path="/login" component={Login} />
 
     <Route path="/" component={NotFound} />

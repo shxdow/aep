@@ -34,11 +34,6 @@ describe('App routing', () => {
     screen.getAllByText(/account/i).forEach((x) => expect(x).toBeInTheDocument());
   });
 
-  it('has a registration page', () => {
-    renderWithRoute('/account/new');
-    expect(screen.getByText(/nuovo account/i)).toBeInTheDocument();
-  });
-
   it('has a 404 page', () => {
     renderWithRoute('/some/random/route');
     expect(screen.getByText(/404/i)).toBeInTheDocument();
@@ -62,5 +57,12 @@ describe('App routing', () => {
   it('has a login page', () => {
     renderWithRoute('/login', true);
     expect(screen.getByText(/inserisci le tue credenziali/i)).toBeInTheDocument();
+  });
+});
+
+describe('Basic authentication', () => {
+  it('goes to the home if there is a logged user', () => {
+    renderWithRoute('/login');
+    expect(screen.queryByText(/inserisci le tue credenziali/i)).toBeNull();
   });
 });

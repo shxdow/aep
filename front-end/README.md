@@ -17,6 +17,10 @@ La pagina si ricarica in automatico se vengono modificati dei file.
 
 Esegue i test.
 
+### `yarn converage`
+
+Genera dei report di test coverage nella cartella `coverage`.
+
 ### `yarn build`
 
 Compila la app per la produzione nella cartella `build`.\

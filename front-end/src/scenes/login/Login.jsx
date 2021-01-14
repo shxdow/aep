@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Cookies from 'js-cookie';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { Card, Form, Button, Col, Image, Alert } from 'react-bootstrap';
 
 import BackgroundImage from '../../resources/login.jpeg';
@@ -110,6 +110,7 @@ const Login = () => {
                       )}
                       <div className="p-3">
                         <Button
+                          data-testid="login-button"
                           block
                           type="submit"
                           variant="primary"
@@ -120,9 +121,6 @@ const Login = () => {
                         >
                           {`Login${loading ? ' ...' : ''}`}
                         </Button>
-                      </div>
-                      <div className="p-3 text-center">
-                        <Link to="/account/new">Nuovo account</Link>
                       </div>
                     </Form>
                   </Col>

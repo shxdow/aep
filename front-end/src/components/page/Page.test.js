@@ -6,24 +6,29 @@ import { Router } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 
 import Page from './Page';
+import TopBar from './TopBar';
 
-const renderPage = (title, content = null) => {
+const renderWithRouter = (content) => {
   const history = createMemoryHistory();
-  return render(
-    <Router history={history}>
-      <Page title={title}>{content}</Page>
-    </Router>
-  );
+  return render(<Router history={history}>{content}</Router>);
 };
 
 describe('Page', () => {
-  it('has always a link to the home', () => {
-    renderPage('Test');
-    expect(screen.getByText(/ticketing/i).closest('a')).toHaveAttribute('href', '/');
+  it('has the correct title', () => {
+    renderWithRouter(<Page title="The quick brown fox" />);
+    expect(screen.getByText('The quick brown fox')).toBeInTheDocument();
+  });
+});
+
+describe('TopBar', () => {
+  it('has the correct title', () => {
+    renderWithRouter(<TopBar title="Test" />);
+    expect(screen.getByText(/test/i)).toBeInTheDocument();
   });
 
-  it('has the correct title', () => {
-    renderPage('The quick brown fox');
-    expect(screen.getByText('The quick brown fox')).toBeInTheDocument();
+  it('has the correct username', () => {
+    sessionStorage.setItem('username', 'Quick brown fox');
+    renderWithRouter(<TopBar title="Test" />);
+    expect(screen.getByText(/quick brown fox/i)).toBeInTheDocument();
   });
 });
