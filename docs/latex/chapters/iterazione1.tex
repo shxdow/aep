@@ -1,0 +1,153 @@
+\section{Introduzione}
+
+In questa fase vengono implementate le strutture e le funzioni utili al fine di avere un
+\textit{Minimum Viable Product} funzionante.
+
+La funzione principale implementata è la \texttt{FU3}, ovvero il \textit{login} ed il \textit{logout}
+di persone con account (sia utenti sia operatori).
+Altre funzioni realizzate sono
+\begin{itemize}
+  \item \texttt{FT7}, l'assegnamento manuale di un ticket;
+  \item \texttt{FO1}, la creazione di un operatore;
+  \item \texttt{FO2}, la modifica di un operatore;
+  \item \texttt{FO3}, l'eliminazione di un operatore.
+\end{itemize}
+
+Oltre all'autenticazione, è stata realizzata anche la struttura dell'applicazione sia lato back-end, in
+linguaggio \textit{Python} e con il framework \textit{Django}, sia lato front-end, usando i linguaggi
+\textit{JavaScript}, \textit{HTML} e \textit{CSS} e con la libreria \textit{React}.
+
+\section{Back-end e REST API}
+
+\section{Front-end}
+
+Il front-end è una \textit{Single Page Application} realizzata in \textit{JavaScript} con l'ausilio
+della libreria open source \textit{React}. Grazie ad essa è possibile costruire componenti grafici
+riutilizzabili, i quali possono anche contenere logica interna complessa.
+
+\subsection{Struttura SPA}
+
+Il codice è suddiviso in varie cartelle\footnote{La struttura del progetto non è data da un
+framework, ma da esperienza personale.}, ma la cartella \texttt{src} contiene tutto il codice.
+A sua volta, \texttt{src} è divisa in:
+
+\begin{itemize}
+  \item \texttt{components}, contenente componenti di pura grafica, indipendenti da dati di dominio;
+  \item \texttt{resources}, per alcune risorse statiche (come ad esempio immagini);
+  \item \texttt{scenes}, che racchiude le varie pagine con cui l'utente interagisce;
+  \item \texttt{theme}, per i CSS ed i font usati nel sito.
+\end{itemize}
+
+Non appartenenti a questa cartella sono \texttt{App.jsx}, che si occupa del rendering della SPA, e
+\texttt{AppRouting.jsx}, che definisce le varie rotte visitabili.
+
+\subsection{Pagine visitabili}
+
+\subsection{Admin console}
+
+La console di amministrazione, usata dagli attori \textit{Amministratori}, è generata
+automaticamente dal framework \textit{Django}.
+
+Grazie ad essa è possibile effettuare l'assegnamento manuale di operatori e ticket a dei gruppi,
+oltre alla gestione (tra cui creazione, modifica ed eliminazione) degli operatori stessi.
+
+\section{Analisi statica}
+
+\section{Analisi dinamica}
+
+\subsection{Testing}
+
+Ci siamo occupati di scrivere dei casi di test per poter avere una buona copertura del codice
+implementato in questa fase, sia lato front-end sia lato back-end.
+
+\subsubsection{Testing front-end}
+
+Lato front-end, è stato usato il framework \textit{Jest} e la libreria \textit{testing-library} al fine di
+esaminare il più possibile la struttura ed il comportamento dell'applicazione web.
+
+Il framework \textit{Jest} riconosce in automatico tutti i file \texttt{Name.test.js} come dei file contenenti
+casi di test, li analizza e li esegue tutti in automatico, a qualsiasi livello essi si trovino.
+
+Ad esempio, un estratto del file \texttt{AppRouting.test.js} è visibile nel seguente snippet.
+
+\begin{lstlisting}
+describe('App routing', () => {
+  it('has a home page', () => {
+    renderWithRoute('/');
+    expect(screen.getByText(/home/i)).toBeInTheDocument();
+  });
+
+  it('has an account page', () => {
+    renderWithRoute('/account');
+    screen.getAllByText(/account/i).forEach((x) => expect(x).toBeInTheDocument());
+  });
+
+  it('has a 404 page', () => {
+    renderWithRoute('/some/random/route');
+    expect(screen.getByText(/404/i)).toBeInTheDocument();
+  });
+});
+\end{lstlisting}
+
+Tramite la libreria di testing usata è possibile anche simulare inserimenti e click dell'utente,
+come è visibile in questo estratto di \texttt{Login.test.js}.
+
+\begin{lstlisting}
+describe('Login page', () => {
+  it('has a username input', () => {
+    renderWithHistory(<Login />);
+    expect(screen.getByPlaceholderText('Inserisci il nome utente')).toBeInTheDocument();
+  });
+
+  it('has a password input', () => {
+    renderWithHistory(<Login />);
+    expect(screen.getByPlaceholderText('Inserisci la password')).toBeInTheDocument();
+  });
+
+  it('correctly accepts inputs', () => {
+    renderWithHistory(<Login />);
+    fireEvent.change(
+      screen.getByPlaceholderText('Inserisci il nome utente'),
+      { target: { value: 'username' } },
+    );
+    fireEvent.change(
+      screen.getByPlaceholderText('Inserisci la password'),
+      { target: { value: 'password123' } },
+    );
+    fireEvent.click(screen.getByTestId('login-button'));
+  });
+});
+\end{lstlisting}
+
+Il framework \textit{Jest} permette anche di generare automaticamente la coverage del codice,
+esplorabile interattivamente anche tramite un documento HTML.
+In figura \ref{fig:code-coverage-front-end-it1} è visibile la pagina principale di questo documento, che
+presenta la copertura di istruzioni, branches, funzioni e righe per ogni cartella del progetto.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{front-end-coverage-it1.jpg}
+  \caption{Front-end code coverage}
+  \label{fig:code-coverage-front-end-it1}
+\end{figure}
+
+In totale, secondo questo primo calcolo, la coverage assume i valori visibili in tabella \ref{tab:code-coverage-front-end-it1}.
+
+\begin{table}
+  \centering
+  \begin{tabular}{|l|r|}
+    \hline Metrica & Copertura percentuale \\
+    \hline
+    \hline Istruzioni & $88.43\%$ \\
+    \hline Branches   & $83.87\%$ \\
+    \hline Funzioni   & $94.29\%$ \\
+    \hline Righe      & $87.61\%$ \\
+    \hline
+  \end{tabular}
+  \caption{Coverage totale per il front-end}
+  \label{tab:code-coverage-front-end-it1}
+\end{table}
+
+\subsubsection{Testing back-end}
+
+% TODO: testing backend

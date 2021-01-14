@@ -10,12 +10,18 @@
 \usepackage{float}
 \usepackage{graphicx}
 \usepackage{import}
+\usepackage{listings}
 
 \graphicspath{{./images/}}
 
 \setlength{\parindent}{0cm}
 \setlength{\parskip}{0.3cm}
 \renewcommand{\arraystretch}{1.2}
+
+\lstset{
+  breaklines=true,
+  upquote=true,
+}
 
 % ==== BIBLIOGRAPHY ====
 %\addbibresource{bibliografia.bib}
@@ -58,6 +64,9 @@
 
   \chapter{Iterazione 0}
   \import{chapters/}{iterazione0.tex}
+
+  \chapter{Iterazione 1}
+  \import{chapters/}{iterazione1.tex}
 
   %  \nocite{*}
   %  \printbibliography[heading=bibintoc]
