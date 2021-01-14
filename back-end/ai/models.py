@@ -11,8 +11,8 @@ class Ticket(models.Model):
 
     OPEN = 'OP'
     CLOSED = 'CL'
-    TRIAGED = 'TR'  # Il sistema automatico ha effettuato lo smistamento
-    PROGRESS = 'PR'  # Le persone hanno iniziato a lavorarci
+    TRIAGED = 'TR'
+    PROGRESS = 'PR'
 
     STATUS_OPTIONS = [
         (OPEN, 'Open'),
@@ -30,6 +30,15 @@ class Ticket(models.Model):
 
 class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+
+class Client(Account):
+    class Meta:
+        permissions = [
+            ("close_ticket",
+             "Can remove a task by setting its status as closed"),
+            ("comment_ticket", "Can leave a comment on ticket"),
+        ]
 
 
 class Operator(Account):
