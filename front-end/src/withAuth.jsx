@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 
 import FakeLoadingPage from './components/page/FakeLoadingPage';
 
-const withAuth = (WrappedComponent, roles = null) => (props) => {
+const withAuth = (WrappedComponent) => (props) => {
   const [loading, setLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const history = useHistory();
@@ -28,6 +28,7 @@ const withAuth = (WrappedComponent, roles = null) => (props) => {
   }
 
   if (isAuthorized) {
+    // eslint-disable-next-line react/jsx-props-no-spreading
     return <WrappedComponent {...props} />;
   }
 

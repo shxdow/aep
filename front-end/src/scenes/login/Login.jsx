@@ -6,7 +6,7 @@ import { Card, Form, Button, Col, Image, Alert } from 'react-bootstrap';
 import BackgroundImage from '../../resources/login.jpeg';
 
 import validate from './validation.login';
-import * as actions from './actions.login';
+import actions from './actions.login';
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,6 @@ const Login = () => {
   useEffect(() => {
     if (Cookies.get('token')) {
       history.push('/');
-      return;
     }
   }, [history]);
 
@@ -48,12 +47,12 @@ const Login = () => {
         await actions.login(username, password);
         setLoading(false);
         history.push('/');
-      } catch (e) {
-        setError(e.message);
+      } catch (ex) {
+        setError(ex.message);
         setLoading(false);
       }
     },
-    [username, password, history]
+    [username, password, history],
   );
 
   if (loading) {

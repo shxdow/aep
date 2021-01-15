@@ -14,13 +14,10 @@ const Menu = () => {
     setSectionOpen((prevSection) => (prevSection === newSection ? '' : newSection));
   }, []);
 
-  const value = useMemo(
-    () => ({
-      sectionOpen,
-      setSectionOpen: updateSection,
-    }),
-    [updateSection, sectionOpen]
-  );
+  const value = useMemo(() => ({
+    sectionOpen,
+    setSectionOpen: updateSection,
+  }), [updateSection, sectionOpen]);
 
   return (
     <MenuSectionOpenContext.Provider value={value}>

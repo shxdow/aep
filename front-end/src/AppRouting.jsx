@@ -11,15 +11,13 @@ import TicketNew from './scenes/ticket-new';
 
 import withAuth from './withAuth';
 
-const AuthRoute = ({ component, ...props }) => <Route {...props} component={withAuth(component)} />;
-
 const AppRouting = () => (
   <Switch>
-    <AuthRoute exact path="/" component={Home} />
-    <AuthRoute exact path="/account" component={Account} />
-    <AuthRoute exact path="/tickets" component={TicketList} />
-    <AuthRoute exact path="/tickets/new" component={TicketNew} />
-    <AuthRoute exact path="/tickets/:ticketId" component={TicketInfo} />
+    <Route exact path="/" component={withAuth(Home)} />
+    <Route exact path="/account" component={withAuth(Account)} />
+    <Route exact path="/tickets" component={withAuth(TicketList)} />
+    <Route exact path="/tickets/new" component={withAuth(TicketNew)} />
+    <Route exact path="/tickets/:ticketId" component={withAuth(TicketInfo)} />
 
     <Route exact path="/login" component={Login} />
 

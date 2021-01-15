@@ -17,20 +17,36 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10"
+    "@testing-library/user-event": "^12.1.10",
+    "eslint-config-airbnb": "18.2.1",
+    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-jsx-a11y": "6.4.1",
+    "eslint-plugin-react": "7.22.0",
+    "eslint-plugin-react-hooks": "4.2.0",
+    "history": "^5.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "coverage": "yarn test --coverage --watchAll=false",
+    "lint-pretty": "yarn eslint --ext .js --ext .jsx src --format html -o linting/report.html",
+    "lint": "yarn eslint --ext .js --ext .jsx src --format table",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest"
-    ]
+      "react-app/jest",
+      "airbnb",
+      "airbnb/hooks"
+    ],
+    "rules": {
+      "arrow-body-style": 0,
+      "jsx-a11y/no-noninteractive-element-interactions": 0,
+      "object-curly-newline": 0,
+      "react/prop-types": 0
+    }
   },
   "browserslist": {
     "production": [

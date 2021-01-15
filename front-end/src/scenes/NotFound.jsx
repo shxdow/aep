@@ -21,7 +21,8 @@ const NotFound = () => {
         </p>
         <p>
           <Button variant="link" onClick={history.goBack}>
-            <i className="fa fa-arrow-left mr-2" /> Torna indietro
+            <i className="fa fa-arrow-left mr-2" />
+            Torna indietro
           </Button>
         </p>
       </div>

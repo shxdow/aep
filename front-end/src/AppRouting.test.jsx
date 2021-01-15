@@ -19,7 +19,7 @@ const renderWithRoute = (route, withoutToken = false) => {
   return render(
     <Router history={history}>
       <AppRouting />
-    </Router>
+    </Router>,
   );
 };
 
