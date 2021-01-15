@@ -7,6 +7,7 @@ La funzione principale implementata è la \texttt{FU3}, ovvero il \textit{login}
 di persone con account (sia utenti sia operatori).
 Altre funzioni realizzate sono
 \begin{itemize}
+  \item \texttt{FU1}, la creazione di un account;
   \item \texttt{FT7}, l'assegnamento manuale di un ticket;
   \item \texttt{FO1}, la creazione di un operatore;
   \item \texttt{FO2}, la modifica di un operatore;
@@ -53,6 +54,21 @@ oltre alla gestione (tra cui creazione, modifica ed eliminazione) degli operator
 
 \section{Analisi statica}
 
+\subsection{Front-end}
+
+Per il front-end è stata utilizzata \textit{ESLint}, una libreria JavaScript che analizza staticamente il codice e
+risolve problemi sia di stile, sia di code quality. 
+
+In particolare, ESLint dà la possibilità di definire dei propri standard del codice, eventualmente derivandoli da altri standard.
+Ad esempio, lo standard da noi usato prende spunto dallo stile di \textit{Airbnb}.
+
+È possibile avere un report dell'analisi statica tramite il comando \texttt{yarn lint} nella cartella \texttt{front-end}.
+Gli specifici stili estesi e le regole sovrascritte sono invece visibili nel file \texttt{package.json}.
+
+%TODO: Maybe mettere immagine
+
+\subsection{Back-end}
+
 \section{Analisi dinamica}
 
 \subsection{Testing}
@@ -68,7 +84,7 @@ esaminare il più possibile la struttura ed il comportamento dell'applicazione w
 Il framework \textit{Jest} riconosce in automatico tutti i file \texttt{Name.test.js} come dei file contenenti
 casi di test, li analizza e li esegue tutti in automatico, a qualsiasi livello essi si trovino.
 
-Ad esempio, un estratto del file \texttt{AppRouting.test.js} è visibile nel seguente snippet.
+Ad esempio, un estratto del file \texttt{AppRouting.test.jsx} è visibile nel seguente snippet.
 
 \begin{lstlisting}
 describe('App routing', () => {
@@ -90,7 +106,7 @@ describe('App routing', () => {
 \end{lstlisting}
 
 Tramite la libreria di testing usata è possibile anche simulare inserimenti e click dell'utente,
-come è visibile in questo estratto di \texttt{Login.test.js}.
+come è visibile in questo estratto di \texttt{Login.test.jsx}.
 
 \begin{lstlisting}
 describe('Login page', () => {
@@ -119,8 +135,16 @@ describe('Login page', () => {
 });
 \end{lstlisting}
 
-Il framework \textit{Jest} permette anche di generare automaticamente la coverage del codice,
-esplorabile interattivamente anche tramite un documento HTML.
+\subsubsection{Testing back-end}
+
+% TODO: testing backend
+
+\subsection{Coverage}
+
+\subsubsection{Front-end}
+
+Il framework \textit{Jest} permette anche di generare automaticamente la coverage del codice tramite il comando
+\texttt{yarn coverage}, esplorabile interattivamente tramite un documento HTML.
 In figura \ref{fig:code-coverage-front-end-it1} è visibile la pagina principale di questo documento, che
 presenta la copertura di istruzioni, branches, funzioni e righe per ogni cartella del progetto.
 
@@ -147,7 +171,3 @@ In totale, secondo questo primo calcolo, la coverage assume i valori visibili in
   \caption{Coverage totale per il front-end}
   \label{tab:code-coverage-front-end-it1}
 \end{table}
-
-\subsubsection{Testing back-end}
-
-% TODO: testing backend
