@@ -67,9 +67,9 @@ def logout(request):
 
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
+#  @user_passes_test(lambda u: u.is_superuser)
 @api_view(['POST'])
-def signup_operator(request):
+def add_operator(request):
 
     try:
         u = User.objects.create_user(username=request.data["username"],
@@ -81,7 +81,6 @@ def signup_operator(request):
         acc.save()
         op = Operator(account=acc, group=None)
         op.save()
-        print(op.pk)
     except Exception as e:
         print(e)
         print(request.data)
