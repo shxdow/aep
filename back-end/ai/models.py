@@ -5,6 +5,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class Group(models.Model):
     """
         Group models
@@ -38,6 +39,7 @@ class Ticket(models.Model):
                               choices=STATUS_OPTIONS,
                               default=OPEN)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
 
 
 class Account(models.Model):
@@ -46,10 +48,8 @@ class Account(models.Model):
     """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    #  name = models.CharField(max_length=72, null=True)
-    #  surname = models.CharField(max_length=72, null=True)
-    username = models.CharField(max_length=72)
-    email = models.CharField(max_length=72, null=True)
+    name = models.CharField(max_length=72, null=True)
+    email = models.CharField(max_length=72)
 
 
 class Comment(models.Model):
@@ -57,15 +57,17 @@ class Comment(models.Model):
         Comment models
     """
 
-    account_id = models.ForeignKey(Account, on_delete=models.CASCADE)
-    ticket_id = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    content = models.CharField(max_length=9980)
+    timestamp = models.DateTimeField()
 
 
 class Client(models.Model):
     """
         Client models
     """
-    account_id = models.OneToOneField(Account, on_delete=models.CASCADE)
+    account = models.OneToOneField(Account, on_delete=models.CASCADE)
 
     class Meta:
         permissions = [
@@ -99,8 +101,8 @@ class Mail(models.Model):
         Mail models
     """
 
-    _from = models.IntegerField()
-    to = models.IntegerField()
+    _from = models.ForeignKey(Account, on_delete=models.CASCADE)
+    to = models.ForeignKey(Account, on_delete=models.CASCADE)
     # RFC 2822 states that the maximum number of characters in a subject line is
     # 998 characters. However, a lot of email clients will impose a 255/256
     # character limit.
