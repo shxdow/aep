@@ -1,13 +1,25 @@
+"""
+    This model contains the models
+"""
+
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
-
 
 class Group(models.Model):
+    """
+        Group models
+    """
     description = models.TextField()
 
 
 class Ticket(models.Model):
+    """
+        Ticket models:
+            - Open
+            - Closed
+            - Triaged
+            - Progress
+    """
 
     OPEN = 'OP'
     CLOSED = 'CL'
@@ -29,6 +41,9 @@ class Ticket(models.Model):
 
 
 class Account(models.Model):
+    """
+        Account models
+    """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     #  name = models.CharField(max_length=72, null=True)
@@ -38,12 +53,18 @@ class Account(models.Model):
 
 
 class Comment(models.Model):
+    """
+        Comment models
+    """
 
     account_id = models.ForeignKey(Account, on_delete=models.CASCADE)
     ticket_id = models.ForeignKey(Ticket, on_delete=models.CASCADE)
 
 
 class Client(models.Model):
+    """
+        Client models
+    """
     account_id = models.OneToOneField(Account, on_delete=models.CASCADE)
 
     class Meta:
@@ -55,6 +76,9 @@ class Client(models.Model):
 
 
 class Operator(models.Model):
+    """
+        Operator models
+    """
     account = models.OneToOneField(
         Account,
         on_delete=models.CASCADE,
@@ -71,6 +95,10 @@ class Operator(models.Model):
 
 
 class Mail(models.Model):
+    """
+        Mail models
+    """
+
     _from = models.IntegerField()
     to = models.IntegerField()
     # RFC 2822 states that the maximum number of characters in a subject line is
