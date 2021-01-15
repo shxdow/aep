@@ -1,11 +1,11 @@
 \documentclass[a4paper,12pt,openright]{report}
 
 \usepackage[T1]{fontenc}
-% \usepackage[backend=biber]{biblatex}
+\usepackage[backend=biber,sorting=none]{biblatex}
 \usepackage[hidelinks]{hyperref}
 \usepackage[italian]{babel}
 \usepackage[utf8]{inputenc}
-% \usepackage{csquotes}
+\usepackage{csquotes}
 \usepackage{array}
 \usepackage{float}
 \usepackage{graphicx}
@@ -24,7 +24,7 @@
 }
 
 % ==== BIBLIOGRAPHY ====
-%\addbibresource{bibliografia.bib}
+\addbibresource{bibliography.bib}
 
 % ==== REAL DOCUMENT BEGINS HERE ====
 \title{%
@@ -68,8 +68,9 @@
   \chapter{Iterazione 1}
   \import{chapters/}{iterazione1.tex}
 
-  %  \nocite{*}
-  %  \printbibliography[heading=bibintoc]
-  %  \thispagestyle{fancy}
+
+  % ------ BIBLIOGRAFIA
+   \nocite{*}
+   \printbibliography[heading=bibintoc]
 
 \end{document}
