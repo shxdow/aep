@@ -62,16 +62,16 @@ mentre il diagramma UML dei casi d'uso è visibile in figura \ref{fig:diag-use-c
     \hline \texttt{U1} & Un utente registrato crea un nuovo ticket da form \\
     \hline \texttt{U2} & Un utente non registrato crea un nuovo ticket inviando una mail \\
     \hline \texttt{U3} & Un utente (sia registrato sia non registrato) può controllare lo stato del ticket \\
-    \hline \texttt{U4} & Un utente registrato può usare il portale per comunicare (inserendo dei commenti) con l'operatore assegnato al ticket \\
+    \hline \texttt{U4} & Un utente registrato può usare il portale per comunicare con un operatore, inserendo dei commenti su un ticket \\
     \hline \texttt{U5} & Un utente crea e gestisce l'account \\
-    \hline \texttt{S1} & Il sistema assegna in automatico un nuovo ticket ad un gruppo di operatori o ad un operatore specifico \\
-    \hline \texttt{S2} & Il sistema fornisce una mail ad un utente non registrato per poter comunicare con l'operatore \\
-    \hline \texttt{O1} & Un operatore può cambiare lo stato del ticket (aperto, chiuso, assegnato, in corso \\
-    \hline \texttt{O2} & Un operatore può inserire commenti sui ticket a cui è assegnato \\
+    \hline \texttt{S1} & Il sistema assegna in automatico un nuovo ticket ad un gruppo di operatori \\
+    \hline \texttt{S2} & Il sistema fornisce una mail ad un utente non registrato per poter comunicare con un operatore \\
+    \hline \texttt{O1} & Un operatore può cambiare lo stato del ticket (aperto, chiuso, assegnato, in corso) \\
+    \hline \texttt{O2} & Un operatore può inserire commenti sui ticket assegnati al proprio gruppo \\
     \hline \texttt{A1.1} & Un amministratore interno all'azienda inserisce un nuovo operatore \\
     \hline \texttt{A1.2} & Un amministratore interno all'azienda modifica un operatore \\
     \hline \texttt{A1.3} & Un amministratore interno all'azienda elimina un operatore \\
-    \hline \texttt{A2} & Un amministratore interno all'azienda assegna manualmente i ticket ad un operatore specifico \\
+    \hline \texttt{A2} & Un amministratore interno all'azienda assegna manualmente i ticket ad gruppo di operatori \\
     \hline \texttt{G1} & Caso d'uso generico che rappresenta l'inserimento di un ticket \\
     \hline
   \end{tabular}
@@ -104,11 +104,11 @@ eccezionali e postcondizioni.
           \item Il sistema assegna in automatico il ticket
         \end{enumerate}
       \item \textbf{Situazioni eccezionali}: nessuna
-      \item \textbf{Postcondizioni}: il ticket è inserito in un database
+      \item \textbf{Postcondizioni}: il ticket è inserito in database
     \end{itemize}
   \item \textbf{U2}: \textit{Creazione ticket via mail}
     \begin{itemize}
-      \item \textbf{Descrizione}: l'utente desidera creare un nuovo ticket tramite email
+      \item \textbf{Descrizione}: l'utente desidera creare un nuovo ticket tramite mail
       \item \textbf{Attori}: utente
       \item \textbf{Precondizioni}: nessuna
       \item \textbf{Passi principali}: 
@@ -119,7 +119,7 @@ eccezionali e postcondizioni.
           \item L'utente viene notificato dal sistema dell'avvenuta ricezione
         \end{enumerate}
       \item \textbf{Situazioni eccezionali}: nessuna
-      \item \textbf{Postcondizioni}: il ticket è inserito in un database
+      \item \textbf{Postcondizioni}: il ticket è inserito in database
     \end{itemize}
   \item \textbf{U3}: \textit{Controllo stato ticket}
     \begin{itemize}
@@ -178,7 +178,7 @@ eccezionali e postcondizioni.
     \end{itemize}
   \item \textbf{S2}: \textit{Generazione mail di comunicazione}
     \begin{itemize}
-      \item \textbf{Descrizione}: il sistema genera una mail che comunica all'utente per la comunicazione con gli operatori
+      \item \textbf{Descrizione}: il sistema genera una mail che l'utente userà per la comunicazione con gli operatori
       \item \textbf{Attori}: nessuno
       \item \textbf{Precondizioni}: il sistema ha ricevuto e inserito in database un nuovo ticket
       \item \textbf{Passi principali}: 
@@ -187,13 +187,13 @@ eccezionali e postcondizioni.
           \item Il sistema comunica all'utente questo indirizzo mail
         \end{enumerate}
       \item \textbf{Situazioni eccezionali}: nessuna
-      \item \textbf{Postcondizioni}: l'utente è in possesso di una mail per la comunicazione con gli operatori
+      \item \textbf{Postcondizioni}: l'utente è in possesso di un indirizzo mail per la comunicazione con gli operatori
     \end{itemize}
   \item \textbf{O1}: \textit{Gestione stato ticket}
     \begin{itemize}
       \item \textbf{Descrizione}: l'operatore cambia lo stato del ticket
       \item \textbf{Attori}: operatore
-      \item \textbf{Precondizioni}: il ticket deve esistere in database e dev'essere stato assegnato, l'operatore deve aver effettuato il login;
+      \item \textbf{Precondizioni}: il ticket deve esistere in database, l'operatore deve aver effettuato il login;
       \item \textbf{Passi principali}: 
         \begin{enumerate}
           \item L'operatore modifica lo stato del ticket
@@ -254,7 +254,7 @@ eccezionali e postcondizioni.
       \item \textbf{Passi principali}: 
         \begin{enumerate}
           \item L'amministratore elimina un operatore
-          \item Il sistema aggiorna i dati in database segnando l'operatore come "eliminato"
+          \item Il sistema rimuove l'operatore dal database
         \end{enumerate}
       \item \textbf{Situazioni eccezionali}: nessuna
       \item \textbf{Postcondizioni}: l'operatore risulta eliminato
@@ -310,13 +310,14 @@ Tutte queste funzionalità sono riassunte nella tabella \ref{tab:requisiti-funzi
     \hline
     \hline \texttt{FU1} & Creazione account \\
     \hline \texttt{FU2} & Gestione account \\
+    \hline \texttt{FU3} & Login e logout \\
     \hline \texttt{FT1} & Creazione ticket tramite form \\
     \hline \texttt{FT2} & Creazione ticket tramite mail \\
     \hline \texttt{FT3} & Controllo stato ticket \\
     \hline \texttt{FT4} & Inserimento commenti \\
     \hline \texttt{FT5} & Gestione stato ticket \\
-    \hline \texttt{FT6} & Assegnameto automatico ticket \\
-    \hline \texttt{FT7} & Assegnameto manuale ticket \\
+    \hline \texttt{FT6} & Assegnamento automatico ticket \\
+    \hline \texttt{FT7} & Assegnamento manuale ticket \\
     \hline \texttt{FO1} & Creazione operatore \\
     \hline \texttt{FO2} & Modifica operatore \\
     \hline \texttt{FO3} & Eliminazione operatore \\
@@ -336,18 +337,18 @@ In figura \ref{fig:diag-componenti} è visibile il \textit{component diagram} de
 Questo diagramma rappresenta la struttura interna del sistema dal punto di vista dei componenti principali
 e delle relazioni tra di essi.
 
-Come si può vedere, il sistema è suddiviso in due parti parti:
+Come si può vedere, il sistema è suddiviso in due parti:
 \begin{itemize}
   \item il \textit{front-end} che si occupa della gestione dell'interfaccia grafica;
   \item il \textit{back-end} che gestisce la \textit{business logic}.
 \end{itemize}
 
-Il \textit{back-end} fornisce delle API al \textit{front-end} tramite i vari componenti \textit{Handler} e comunica sia con il DBMS sia
+Il \textit{back-end} fornisce delle API al \textit{front-end} tramite i vari componenti e comunica sia con il DBMS sia
 con il server mail esterno.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\linewidth]{component-diagram.png}
+  \includegraphics[width=0.9\linewidth]{component-diagram.png}
   \caption{Diagramma dei componenti}
   \label{fig:diag-componenti}
 \end{figure}
@@ -358,7 +359,7 @@ Il \textit{class diagram} visibile in figura \ref{fig:diag-class} descrive le va
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\linewidth]{class-diagram.png}
+  \includegraphics[width=0.95\linewidth]{class-diagram.png}
   \caption{Diagramma delle classi}
   \label{fig:diag-class}
 \end{figure}
@@ -397,7 +398,7 @@ i vari componenti identificati alla sezione \ref{sec:component-diagram} sono ist
 
 Nel diagramma sono presenti tre \textit{device}:
 \begin{enumerate}
-  \item un client che gestirà il \textit{front-end} del sistema;
-  \item un nostro \textit{server} che si occuperà anche del database a fine di semplificare e velocizzare l'interazione tra logica e dati;
-  \item un \textit{server email} esterno che si occuperà delle varie caselle email.
+  \item Un client che gestirà il \textit{front-end} del sistema;
+  \item Un nostro \textit{server} che si occuperà anche del database a fine di semplificare e velocizzare l'interazione tra logica e dati;
+  \item Un \textit{server email} esterno per la gestione delle caselle mail.
 \end{enumerate}
