@@ -1,22 +1,36 @@
+"""
+    Test module
+"""
+
 from django.test import TestCase, RequestFactory
-from ai.models import Account, Client, Group, Operator
 from django.contrib.auth.models import User
+from ai.models import Account, Client, Group, Operator
 from .views import add_operator, handle_operator, add_client, handle_client, add_group, handle_group
 
 
 class GroupTestCase(TestCase):
-    def setUp(self):
+    """
+        Test cases for groups
+    """
 
+    def setUp(self):
         self.factory = RequestFactory()
         self.user = User.objects.create_user(username='name', password='sur')
 
     def test_get_group(self):
+        """
+            Tests the get endpoint for a particular group
+        """
         request = self.factory.get('/group/1/')
         request.user = self.user
         response = handle_group(request, 1)
         self.assertEqual(response.status_code, 200)
 
     def test_put_group(self):
+        """
+            Tests the edit of a particular group
+        """
+
         request = self.factory.put('/group/1/', {
             "description": "changed",
         })
@@ -25,7 +39,9 @@ class GroupTestCase(TestCase):
         self.assertEqual(response.status_code, 201)
 
     def test_add_group(self):
-
+        """
+            Tests the create of a group
+        """
         request = self.factory.post(
             '/group/add/', {
                 "description":
@@ -38,6 +54,9 @@ class GroupTestCase(TestCase):
 
 
 class ClientTestCase(TestCase):
+    """
+        Test cases for clients
+    """
     def setUp(self):
 
         self.factory = RequestFactory()
@@ -45,10 +64,13 @@ class ClientTestCase(TestCase):
         self.user.save()
         self.acc = Account(user=self.user, username='name')
         self.acc.save()
-        self.cl = Client(account_id=self.acc)
-        self.cl.save()
+        self.client = Client(account_id=self.acc)
+        self.client.save()
 
     def test_get_client(self):
+        """
+            Tests the get endpoint for a particular client
+        """
         request = self.factory.get('/client/1/')
         request.user = self.user
         response = handle_client(request, 1)
@@ -64,6 +86,9 @@ class ClientTestCase(TestCase):
     #      self.assertEqual(response.status_code, 201)
 
     def test_add_client(self):
+        """
+            Test the create of a client
+        """
 
         request = self.factory.post('/operator/add/', {
             "username": "op",
@@ -76,17 +101,22 @@ class ClientTestCase(TestCase):
 
 
 class OperatorTestCase(TestCase):
+    """
+        Test cases for operators
+    """
     def setUp(self):
-
         self.factory = RequestFactory()
         self.user = User.objects.create_user(username='name', password='sur')
         self.user.save()
         self.acc = Account(user=self.user, username='name')
         self.acc.save()
-        self.op = Operator(account=self.acc, group=None)
-        self.op.save()
+        self.operator = Operator(account=self.acc, group=None)
+        self.operator.save()
 
     def test_get_opertor(self):
+        """
+            Tests the get endpoint for a particular operator
+        """
         request = self.factory.get('/operator/1/')
         request.user = self.user
         response = handle_operator(request, 1)
@@ -102,6 +132,9 @@ class OperatorTestCase(TestCase):
     #      self.assertEqual(response.status_code, 201)
 
     def test_add_operator(self):
+        """
+            Test the create of an operator
+        """
 
         request = self.factory.post('/operator/add', {
             "username": "op",
@@ -114,11 +147,17 @@ class OperatorTestCase(TestCase):
 
 
 class GroupTestCase(TestCase):
+    """
+        Groups test cases
+    """
     def setUp(self):
         Group.objects.create(description="Engineering")
         Group.objects.create(description="Sales lol")
         Group.objects.create(description="Marketing")
 
     def test_group_exists(self):
-        engTeam = Group.objects.get(description="Engineering")
-        self.assertEqual(engTeam.description, "Engineering")
+        """
+            Tests the group exist
+        """
+        eng_team = Group.objects.get(description="Engineering")
+        self.assertEqual(eng_team.description, "Engineering")
