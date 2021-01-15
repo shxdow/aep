@@ -58,6 +58,11 @@ describe('App routing', () => {
     renderWithRoute('/login', true);
     expect(screen.getByText(/inserisci le tue credenziali/i)).toBeInTheDocument();
   });
+
+  it('has a user signup page', () => {
+    renderWithRoute('/signup');
+    expect(screen.getByText(/crea account/i)).toBeInTheDocument();
+  });
 });
 
 describe('Basic authentication', () => {
