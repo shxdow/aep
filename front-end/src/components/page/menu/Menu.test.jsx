@@ -20,9 +20,12 @@ describe('Menu', () => {
     expect(screen.getByText(/ai ticketing/i).closest('a')).toHaveAttribute('href', '/');
   });
 
-  it('has clickable sections', () => {
+  it('has clickable (with toggle behaviour) sections', () => {
     renderWithRouter(<Menu />);
-    fireEvent.click(screen.getByText(/^ticket$/i).closest('li'));
+    const section = screen.getByText(/^ticket$/i).closest('li');
+    fireEvent.click(section);
+    fireEvent.click(section);
+    fireEvent.keyDown(section, { key: 'Enter' });
   });
 });
 

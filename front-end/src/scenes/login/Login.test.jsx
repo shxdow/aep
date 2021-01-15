@@ -28,13 +28,18 @@ describe('Login page', () => {
     renderWithHistory(<Login />);
     fireEvent.change(screen.getByPlaceholderText('Inserisci il nome utente'), { target: { value: 'username' } });
     fireEvent.change(screen.getByPlaceholderText('Inserisci la password'), { target: { value: 'password123' } });
-    fireEvent.click(screen.getByTestId('login-button'));
+    fireEvent.click(screen.getByTestId('login-button'), { preventDefault: () => { } });
+  });
+
+  it('handles wrong input', () => {
+    renderWithHistory(<Login />);
+    fireEvent.click(screen.getByTestId('login-button'), { preventDefault: () => { } });
   });
 
   it('has a link to the signup page', () => {
     renderWithHistory(<Login />);
     expect(screen.getByText(/nuovo account/i).closest('a')).toHaveAttribute('href', '/signup');
-  })
+  });
 });
 
 describe('Login validation', () => {

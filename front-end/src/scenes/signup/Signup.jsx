@@ -47,8 +47,8 @@ const Signup = () => {
     async (e) => {
       e.preventDefault();
 
-      const errors = validate({ username, password });
-      if (errors.username || errors.password) {
+      const errors = validate({ username, password, confermaPassword });
+      if (errors.username || errors.password || errors.confermaPassword) {
         setUsernameError(errors.username);
         setPasswordError(errors.password);
         setConfermaPasswordError(errors.confermaPassword);
@@ -64,7 +64,7 @@ const Signup = () => {
         setLoading(false);
       }
     },
-    [username, password, history],
+    [username, password, confermaPassword, history],
   );
 
   return (
@@ -108,7 +108,7 @@ const Signup = () => {
                           />
                           <Form.Control.Feedback type="invalid">{passwordError}</Form.Control.Feedback>
                         </Form.Group>
-                        <Form.Group controlId="password">
+                        <Form.Group controlId="confermaPassword">
                           <Form.Label>Conferma password</Form.Label>
                           <Form.Control
                             name="confermaPassword"

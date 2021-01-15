@@ -29,19 +29,29 @@ describe('Signup page', () => {
     expect(screen.getByLabelText(/conferma password/i)).toBeInTheDocument();
   });
 
+  it('handles wrong input', () => {
+    renderWithHistory(<Signup />);
+
+    fireEvent.click(screen.getByText(/crea account/i));
+
+    fireEvent.blur(screen.getByLabelText(/nome utente/i));
+    fireEvent.blur(screen.getByLabelText(/^password$/i));
+    fireEvent.blur(screen.getByLabelText(/^conferma password$/i));
+  });
+
   it('correctly accepts inputs', () => {
     renderWithHistory(<Signup />);
-    const username = screen.getByLabelText(/nome utente/i);
-    const password = screen.getByLabelText(/^password$/i);
-    const confermaPassword = screen.getByLabelText(/conferma password/i);
+    const username = screen.getByLabelText(/nome utente/i).closest('input');
+    const password = screen.getByLabelText(/^password$/i).closest('input');
+    const confermaPassword = screen.getByLabelText(/^conferma password$/i).closest('input');
 
     fireEvent.change(username, { target: { value: 'username' } });
-    fireEvent.blur(username);
+    fireEvent.blur(username, { name: 'username' });
     fireEvent.change(password, { target: { value: 'Password123' } });
-    fireEvent.blur(password);
+    fireEvent.blur(password, { name: 'password' });
     fireEvent.change(confermaPassword, { target: { value: 'Password123' } });
-    fireEvent.blur(confermaPassword);
-    fireEvent.click(screen.getByTestId('signup-button'));
+    fireEvent.blur(confermaPassword, { name: 'confermaPassword' });
+    fireEvent.click(screen.getByText(/crea account/i), { preventDefault: () => { } });
   });
 });
 
