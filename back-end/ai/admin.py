@@ -1,5 +1,9 @@
+"""
+    This module contains admin register models
+"""
+
 from django.contrib import admin
-from .models import Group, Ticket, Operator, Account, Mail
+from .models import Group, Ticket, Operator, Account #, Mail
 
 # Register your models here.
 admin.site.register(Group)
