@@ -1,13 +1,26 @@
+"""
+    This model contains the models
+"""
+
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
 
 
 class Group(models.Model):
+    """
+        Group models
+    """
     description = models.TextField()
 
 
 class Ticket(models.Model):
+    """
+        Ticket models:
+            - Open
+            - Closed
+            - Triaged
+            - Progress
+    """
 
     OPEN = 'OP'
     CLOSED = 'CL'
@@ -26,13 +39,36 @@ class Ticket(models.Model):
                               choices=STATUS_OPTIONS,
                               default=OPEN)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
 
 
 class Account(models.Model):
+    """
+        Account models
+    """
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=72, null=True)
+    email = models.CharField(max_length=72)
 
 
-class Client(Account):
+class Comment(models.Model):
+    """
+        Comment models
+    """
+
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    content = models.CharField(max_length=9980)
+    timestamp = models.DateTimeField()
+
+
+class Client(models.Model):
+    """
+        Client models
+    """
+    account = models.OneToOneField(Account, on_delete=models.CASCADE)
+
     class Meta:
         permissions = [
             ("close_ticket",
@@ -41,7 +77,17 @@ class Client(Account):
         ]
 
 
-class Operator(Account):
+class Operator(models.Model):
+    """
+        Operator models
+    """
+    account = models.OneToOneField(
+        Account,
+        on_delete=models.CASCADE,
+    )
+
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True)
+
     class Meta:
         permissions = [
             ("close_ticket",
@@ -49,15 +95,14 @@ class Operator(Account):
             ("change_ticket_status", "Can change the status of tasks"),
         ]
 
-    group = models.ForeignKey(
-        Group,
-        on_delete=models.CASCADE,
-    )
-
 
 class Mail(models.Model):
-    _from = models.IntegerField()
-    to = models.IntegerField()
+    """
+        Mail models
+    """
+
+    _from = models.ForeignKey(Account, on_delete=models.CASCADE)
+    to = models.ForeignKey(Account, on_delete=models.CASCADE)
     # RFC 2822 states that the maximum number of characters in a subject line is
     # 998 characters. However, a lot of email clients will impose a 255/256
     # character limit.
