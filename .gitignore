@@ -156,4 +156,4 @@ front-end/node_modules
 front-end/.eslintcache
 front-end/build
 front-end/coverage
-front-end/linting
+front-end/linting/report.html
