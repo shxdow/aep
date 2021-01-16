@@ -180,22 +180,57 @@ Non appartenenti a questa cartella sono \texttt{App.jsx}, che si occupa del rend
 
 \subsection{Pagine visitabili}
 
+Le pagine visitabili sono\footnote{La home, la pagina di account e le pagine relative ai ticket sono implementate in iterazioni future}
+
+\begin{itemize}
+  \item una pagina di \textit{login};
+  \item una pagina di \textit{registrazione};
+  \item una home;
+  \item una pagina per la visualizzazione dei propri dati;
+  \item pagine per la visualizzazione dei ticket, del loro stato e per l'inserimento di commenti.
+\end{itemize}
+
+Come esempio, in figura \ref{fig:page-signup} è visibile il form di registrazione utente.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{page-signup.jpg}
+  \caption{Pagina di registrazione}
+  \label{fig:page-signup}
+\end{figure}
+
 \section{Analisi statica}
+
+\subsection{Back-end}
+
+Per l'analisi statica del back-end sono stati usati diversi tool, dei quali il principale è \textit{pylint},
+un \textit{linter} configurabile per il linguaggio \textit{Python}.
+Esso mette a disposizione varie funzionalità:
+
+\begin{itemize}
+  \item imposizione di \textit{coding standards} e di \textit{code style};
+  \item \textit{error detection}, sia a livello sintattico sia a livelli di tipi;
+  \item \textit{refactoring} per codice non usato e/o duplicato;
+  \item integrazione con vari IDE al fine di fornire tutto ciò in tempo reale.
+\end{itemize}
+
+\textit{Pylint} è configurato tramite il file \texttt{.pylintrc} presente nella cartella del back-end,
+il quale contiene tutti parametri e le impostazioni da noi scelti per diminuire la complessità del codice
+ed aumentarne la chiarezza. È possibile utilizzare lo script \texttt{lint-backend.sh} per eseguire il linting del progetto.
+
+Oltre a \textit{warning} ed errori, nell'output è presente anche un singolo numero (su una scala da 1 a 10) che
+valuta il codice. In particolare, alla fine di questa iterazione questo valore è pari a $8.78$.
 
 \subsection{Front-end}
 
 Per il front-end è stata utilizzata \textit{ESLint}, una libreria JavaScript che analizza staticamente il codice e
 risolve problemi sia di stile, sia di code quality. 
 
-In particolare, ESLint dà la possibilità di definire dei propri standard del codice, eventualmente derivandoli da altri standard.
+In particolare, \textit{ESLint} dà la possibilità di definire dei propri standard del codice, eventualmente derivandoli da altri standard.
 Ad esempio, lo standard da noi usato prende spunto dallo stile di \textit{Airbnb}.
 
 È possibile avere un report dell'analisi statica tramite il comando \texttt{yarn lint} nella cartella \texttt{front-end}.
 Gli specifici stili estesi e le regole sovrascritte sono invece visibili nel file \texttt{package.json}.
-
-%TODO: Maybe mettere immagine
-
-\subsection{Back-end}
 
 \section{Analisi dinamica}
 
@@ -203,6 +238,107 @@ Gli specifici stili estesi e le regole sovrascritte sono invece visibili nel fil
 
 Ci siamo occupati di scrivere dei casi di test per poter avere una buona copertura del codice
 implementato in questa fase, sia lato front-end sia lato back-end.
+
+\subsubsection{Testing back-end}
+
+I casi di test sono definiti nel file \texttt{tests.py}. Il framework \textit{Django} mette a
+disposizione un package per la definizione di \textit{unit test}, ed in particolare offre la classe
+\texttt{TestCase} che è possibile estendere per definire casi di test personalizzati.
+
+I casi di test sono stati definiti su tutti i modelli e tutte le \textit{views} realizzati nell'iterazione.
+Come esempio, di seguito è visibile il caso di test per la gestione dell'autenticazione (commenti esclusi).
+
+\begin{lstlisting}[language=Python]
+class AuthTestCase(TestCase):
+  def setUp(self):
+      self.factory = RequestFactory()
+      self.user = User.objects.create_user(username='name', password='sur')
+
+  def test_auth(self):
+      request = self.factory.post('/auth/', {
+          'username': 'name',
+          'password': 'sur',
+      })
+
+  def test_logout(self):
+      request = self.factory.get('/logout/')
+\end{lstlisting}
+
+O ancora, i casi di test per gli endpoint relativi all'entità \texttt{Client}
+(rimossi commenti e docstring per brevità).
+
+\begin{lstlisting}[language=Python]
+class ClientTestCase(TestCase):
+  def setUp(self):
+      self.factory = RequestFactory()
+      self.user = User.objects.create_user(username='em@ma.il', password='sur')
+      self.user.save()
+      self.acc = Account(user=self.user, email='em@ma.il')
+      self.acc.save()
+      self.client = Client(account=self.acc)
+      self.client.save()
+
+  def test_delete_client(self):
+      request = self.factory.delete('/client/1/')
+      request.user = self.user
+      response = handle_client(request, 1)
+      self.assertEqual(response.status_code, 200)
+
+  def test_patch_client(self):
+      request = self.factory.patch('/client/1')
+      request.user = self.user
+      response = handle_client(request, 1)
+      self.assertEqual(response.status_code, 405)
+
+  def test_delete_fail_client(self):
+      request = self.factory.delete('/client/12345/')
+      request.user = self.user
+      response = handle_client(request, 12345)
+      self.assertEqual(response.status_code, 404)
+
+  def test_get_client(self):
+      request = self.factory.get('/client/1/')
+      request.user = self.user
+      response = handle_client(request, 1)
+      self.assertEqual(response.status_code, 200)
+
+  def test_get_fail_client(self):
+      request = self.factory.get('/client/12345/')
+      request.user = self.user
+      response = handle_client(request, 12345)
+      self.assertEqual(response.status_code, 404)
+
+  def test_put_client(self):
+      request = self.factory.put('/client/1/', {
+          "account": {
+              'id': 1,
+              'email': 'changed@ma.il'
+          },
+      }, content_type='application/json')
+      request.user = self.user
+      response = handle_client(request, 1)
+      self.assertEqual(response.status_code, 200)
+
+  def test_add_client(self):
+      request = self.factory.post('/client/add/', {
+          "username": "op",
+          "password": "psw"
+      })
+
+      request.user = self.user
+      response = add_client(request)
+      self.assertEqual(response.status_code, 201)
+
+  def test_add_fail_client(self):
+      request = self.factory.post('/client/add', {
+          "noparam": "op",
+          "password": "psw"
+      })
+
+      request.user = self.user
+      response = add_client(request)
+      self.assertEqual(response.status_code, 500)
+\end{lstlisting}
 
 \subsubsection{Testing front-end}
 
@@ -263,15 +399,27 @@ describe('Login page', () => {
 });
 \end{lstlisting}
 
-\subsubsection{Testing back-end}
-
-% TODO: testing backend
-
 \subsection{Coverage}
+
+\subsubsection{Back-end}
+
+Per il back-end è stato usato \textit{Coverage.py}, uno strumento atto a misurare la copertura del
+codice per il linguaggio Python. È anche disponibile un output interattivo in HTML, il cui output per il
+codice di questa iterazione è visibile in figura \ref{fig:back-end-coverage-it1}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth]{back-end-coverage-it1.jpg}
+  \caption{Back-end code coverage}
+  \label{fig:back-end-coverage-it1}
+\end{figure}
+
+Se si desidera, è possibile utilizzare lo script \texttt{coverage-backend.sh} per generare i report HTML
+nella cartella \texttt{back-end/htmlcov}.
 
 \subsubsection{Front-end}
 
-Il framework \textit{Jest} permette anche di generare automaticamente la coverage del codice tramite il comando
+Il framework di testing \textit{Jest} permette anche di generare automaticamente la coverage del codice tramite il comando
 \texttt{yarn coverage}, esplorabile interattivamente tramite un documento HTML.
 In figura \ref{fig:code-coverage-front-end-it1} è visibile la pagina principale di questo documento, che
 presenta la copertura di istruzioni, branches, funzioni e righe per ogni cartella del progetto.
