@@ -6,7 +6,7 @@ import 'ag-grid-community/dist/styles/ag-theme-balham.css';
 
 const dimensions = { width: '100%', height: 500 };
 
-const Table = ({ children, data, loading }) => {
+const Table = ({ children, data, loading, quickFilter, onRowSelected }) => {
   const gridApi = useRef(null);
 
   const onGridReady = useCallback((params) => {
@@ -14,23 +14,27 @@ const Table = ({ children, data, loading }) => {
   }, []);
 
   useEffect(() => {
-    if (!gridApi.current) {
-      return;
-    }
-
     if (loading) {
-      gridApi.current.showLoadingOverlay();
+      gridApi.current?.showLoadingOverlay();
     } else {
-      gridApi.current.hideOverlay();
+      gridApi.current?.hideOverlay();
     }
   }, [loading]);
+
+  const onSelectionChanged = useCallback((e) => {
+    onRowSelected(e.api.getSelectedRows());
+  }, [onRowSelected]);
 
   return (
     <div className="ag-theme-balham" style={dimensions}>
       <AgGridReact
+        animateRows
+        rowSelection="single"
         onGridReady={onGridReady}
+        quickFilterText={quickFilter}
         overlayLoadingTemplate={'<span class="ag-overlay-loading-center">Loading...</span>'}
         rowData={data}
+        onSelectionChanged={onSelectionChanged}
       >
         {children}
       </AgGridReact>

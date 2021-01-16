@@ -1,0 +1,58 @@
+import React from 'react';
+import { render, screen, act, wait, fireEvent, queryAllByAttribute } from '@testing-library/react';
+import { createMemoryHistory } from 'history';
+import { Router } from 'react-router-dom';
+
+import '@testing-library/jest-dom/extend-expect';
+
+import TicketList from './TicketList';
+import { Status } from './constants.tickets';
+
+const waitForPainting = async (wrapper) => {
+  await act(async () => {
+    await new Promise(resolve => setTimeout(resolve, 0));
+    wrapper.update();
+  });
+};
+
+const renderWithRouter = (content) => {
+  const history = createMemoryHistory();
+  const wrapper = render(<Router history={history}>{content}</Router>);
+  waitForPainting(wrapper);
+  return { wrapper, history };
+};
+
+
+describe('Ticket list', () => {
+  it('renders correctly', () => {
+    renderWithRouter(<TicketList />);
+  });
+
+  it('filters data', () => {
+    renderWithRouter(<TicketList />);
+    fireEvent.change(
+      screen.getByPlaceholderText('Filtra...'),
+      { target: { value: 'Titolo' } }
+    );
+  });
+
+  it('correctly formats the status of a ticket', () => {
+    expect(Status.format({ value: Status.Open })).toBe('Aperto');
+    expect(Status.format({ value: Status.Closed })).toBe('Chiuso');
+    expect(Status.format({ value: Status.Progress })).toBe('In corso');
+    expect(Status.format({ value: Status.Triaged })).toBe('Assegnato');
+  });
+
+  it('goes to the ticket creation page', () => {
+    const { history: h } = renderWithRouter(<TicketList />);
+    fireEvent.click(screen.getByTestId('create-button'));
+    expect(h.location.pathname).toBe('/tickets/new');
+  });
+
+  it('goes to the ticket edit page', () => {
+    const { wrapper, history: h } = renderWithRouter(<TicketList />);
+    const getCheckboxes = queryAllByAttribute.bind(null, 'type');
+    fireEvent.click(getCheckboxes(wrapper.container, 'checkbox')[0]);
+    fireEvent.click(screen.getByTestId('edit-button'));
+  });
+});

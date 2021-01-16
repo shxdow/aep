@@ -39,6 +39,7 @@ const CardElenco = ({
                   )}
                   {onEdit && (
                     <Button
+                      data-testid="edit-button"
                       variant="outline-primary"
                       disabled={!buttonsEnabled}
                       onClick={onEdit}
@@ -46,7 +47,11 @@ const CardElenco = ({
                       Modifica
                     </Button>
                   )}
-                  <Button variant="outline-primary" onClick={onCreate}>
+                  <Button
+                    data-testid="create-button"
+                    variant="outline-primary"
+                    onClick={onCreate}
+                  >
                     Crea
                   </Button>
                 </ButtonGroup>
