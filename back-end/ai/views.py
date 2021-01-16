@@ -14,7 +14,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import Ticket, Group, Operator, Account, Client
-# from .serializers import TicketSerializer, GroupSerializer, OperatorSerializer, AccountSerializer, ClientSerializer
 
 
 @csrf_exempt
@@ -26,9 +25,9 @@ def signup(request):
 
     try:
         user = User.objects.create_user(username=request.data["username"],
-                                     password=request.data["password"])
+                                        password=request.data["password"])
         user.save()
-        acc = Account(user=user, username=request.data["username"])
+        acc = Account(user=user, email=request.data["username"])
         acc.save()
     except:
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -67,17 +66,14 @@ def add_operator(request):
     """
     try:
         user = User.objects.create_user(username=request.data["username"],
-                                     password=request.data["password"])
+                                        password=request.data["password"])
 
-        #  password=request.data["password"])
         user.save()
-        acc = Account(user=user, username=request.data["username"])
+        acc = Account(user=user, email=request.data["username"])
         acc.save()
         operator = Operator(account=acc, group=None)
         operator.save()
     except Exception as e:
-        print(e)
-        print(request.data)
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(status=status.HTTP_201_CREATED)
 
@@ -90,32 +86,16 @@ def add_client(request):
 
     try:
         user = User.objects.create_user(username=request.data["username"],
-                                     password=request.data["password"])
+                                        password=request.data["password"])
 
         user.save()
-        acc = Account(user=user, username=request.data["username"])
+        acc = Account(user=user, email=request.data["username"])
         acc.save()
-        client = Client(account_id=acc)
+        client = Client(account=acc)
         client.save()
     except Exception as e:
-        print(e)
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(status=status.HTTP_201_CREATED)
-
-
-#  @login_required
-#  @api_view(['POST'])
-#  def add_ticket(request):
-#
-#      try:
-#          ticket = User.objects.create_user()
-#
-#      except:
-#          return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-#      return Response(status=status.HTTP_201_CREATED)
-
-
-#  @user_passes_test(lambda u: u.is_superuser)
 
 
 @login_required
@@ -134,7 +114,7 @@ def add_group(request):
 
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
+#  @user_passes_test(lambda u: u.is_superuser)
 @api_view(['GET', 'PUT', 'DELETE'])
 def handle_group(request, pk):
     """
@@ -154,16 +134,16 @@ def handle_group(request, pk):
         try:
             Group.objects.filter(pk=pk).update(
                 description=request.data["description"])
+            return Response(status=status.HTTP_200_OK)
         except Group.DoesNotExist as ex:
             raise Http404 from ex
     elif request.method == 'DELETE':
         try:
             group = Group.objects.get(pk=pk)
             group.delete()
+            return Response(status=status.HTTP_200_OK)
         except Group.DoesNotExist as ex:
             raise Http404 from ex
-
-    return Response(status=status.HTTP_200_OK)
 
 
 @login_required
@@ -180,26 +160,26 @@ def handle_operator(request, pk):
     if request.method == 'GET':
         try:
             operator = model_to_dict(Operator.objects.get(pk=pk))
-            operator["account"] = model_to_dict(Operator.objects.get(pk=pk).account)
+            operator["account"] = model_to_dict(
+                Operator.objects.get(pk=pk).account)
             return Response(operator)
         except Operator.DoesNotExist as ex:
             raise Http404 from ex
     elif request.method == 'PUT':
-        print(request.data)
         try:
             Operator.objects.filter(pk=pk).update(group=request.data["group"])
             Account.objects.filter(pk=request.data["account"]["id"]).update(
                 email=request.data["account"]["email"])
+            return Response(status=status.HTTP_200_OK)
         except Operator.DoesNotExist as ex:
             raise Http404 from ex
     elif request.method == 'DELETE':
         try:
             operator = Operator.objects.get(pk=pk)
             operator.delete()
+            return Response(status=status.HTTP_200_OK)
         except Operator.DoesNotExist as ex:
             raise Http404 from ex
-
-    return Response(status=status.HTTP_200_OK)
 
 
 @login_required
@@ -215,28 +195,24 @@ def handle_client(request, pk):
     if request.method == 'GET':
         try:
             client = model_to_dict(Client.objects.get(pk=pk))
-            client["account_id"] = model_to_dict(
-                Client.objects.get(pk=pk).account_id)
-            #  cl["account_id"]["user"] = model_to_dict(
-            #      Client.objects.get(pk=pk).account_id.user)
-            #  print(cl)
-
+            client["account"] = model_to_dict(
+                Client.objects.get(pk=pk).account)
             return Response(client)
         except Client.DoesNotExist as ex:
             raise Http404 from ex
     elif request.method == 'PUT':
         try:
-            #  Client.objects.filter(pk=pk).update(
-            #      account_id=request.data["account_id"])
-            Account.objects.filter(pk=request.data["account_id"]["id"]).update(
-                email=request.data["account_id"]["email"])
+            Account.objects.filter(pk=request.data["account"]["id"]).update(
+                email=request.data["account"]["email"])
+            return Response(status=status.HTTP_200_OK)
         except Client.DoesNotExist as ex:
             raise Http404 from ex
     elif request.method == 'DELETE':
         try:
             client = Client.objects.get(pk=pk)
             client.delete()
+            return Response(status=status.HTTP_200_OK)
         except Client.DoesNotExist as ex:
             raise Http404 from ex
-
-    return Response(status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
