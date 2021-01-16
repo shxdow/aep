@@ -1,4 +1,5 @@
 import React from 'react';
+import Cookies from 'js-cookie';
 import { render, screen } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
@@ -7,13 +8,18 @@ import '@testing-library/jest-dom/extend-expect';
 
 import AppRouting from './AppRouting';
 
-const renderWithRoute = (route) => {
+const renderWithRoute = (route, withoutToken = false) => {
+  if (withoutToken) {
+    Cookies.remove('token');
+  } else {
+    Cookies.set('token', 'test_token');
+  }
   const history = createMemoryHistory();
   history.push(route);
   return render(
     <Router history={history}>
       <AppRouting />
-    </Router>
+    </Router>,
   );
 };
 
@@ -26,11 +32,6 @@ describe('App routing', () => {
   it('has an account page', () => {
     renderWithRoute('/account');
     screen.getAllByText(/account/i).forEach((x) => expect(x).toBeInTheDocument());
-  });
-
-  it('has a registration page', () => {
-    renderWithRoute('/account/new');
-    expect(screen.getByText(/nuovo account/i)).toBeInTheDocument();
   });
 
   it('has a 404 page', () => {
@@ -54,7 +55,19 @@ describe('App routing', () => {
   });
 
   it('has a login page', () => {
-    renderWithRoute('/login');
+    renderWithRoute('/login', true);
     expect(screen.getByText(/inserisci le tue credenziali/i)).toBeInTheDocument();
+  });
+
+  it('has a user signup page', () => {
+    renderWithRoute('/signup');
+    expect(screen.getByText(/crea account/i)).toBeInTheDocument();
+  });
+});
+
+describe('Basic authentication', () => {
+  it('goes to the home if there is a logged user', () => {
+    renderWithRoute('/login');
+    expect(screen.queryByText(/inserisci le tue credenziali/i)).toBeNull();
   });
 });

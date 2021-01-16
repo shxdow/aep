@@ -155,3 +155,5 @@ secrets.js
 front-end/node_modules
 front-end/.eslintcache
 front-end/build
+front-end/coverage
+front-end/linting/report.html
