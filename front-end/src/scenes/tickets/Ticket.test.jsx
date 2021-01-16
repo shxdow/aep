@@ -6,6 +6,7 @@ import { Router } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 
 import TicketList from './TicketList';
+import TicketNew from './TicketNew';
 import { Status } from './constants.tickets';
 
 const waitForPainting = async (wrapper) => {
@@ -49,3 +50,40 @@ describe('Ticket list', () => {
     expect(h.location.pathname).toBe('/tickets/new');
   });
 });
+
+describe('Ticket creationg page', () => {
+  it('renders correctly', () => {
+    renderWithRouter(<TicketNew />);
+  });
+
+  it('has a title input', () => {
+    renderWithRouter(<TicketNew />);
+    expect(screen.getByLabelText(/titolo/i)).toBeInTheDocument();
+  });
+
+  it('has a content input', () => {
+    renderWithRouter(<TicketNew />);
+    expect(screen.getByLabelText(/contenuto/i)).toBeInTheDocument();
+  });
+
+  it('handles wrong input', () => {
+    renderWithRouter(<TicketNew />);
+
+    fireEvent.click(screen.getByText(/crea ticket/i));
+
+    fireEvent.blur(screen.getByLabelText(/titolo/i));
+    fireEvent.blur(screen.getByLabelText(/contenuto/i));
+  });
+
+  it('handles correct inputs', () => {
+    renderWithRouter(<TicketNew />);
+    const title = screen.getByLabelText(/titolo/i).closest('input');
+    const content = screen.getByLabelText(/contenuto/i).closest('input');
+
+    fireEvent.change(title, { target: { value: 'titolo' } });
+    fireEvent.blur(title, { name: 'title' });
+    fireEvent.change(content, { target: { value: 'Contenuto' } });
+    fireEvent.blur(content, { name: 'contenuto' });
+    fireEvent.click(screen.getByText(/crea ticket/i), { preventDefault: () => { } });
+  });
+})

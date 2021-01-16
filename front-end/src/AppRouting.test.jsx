@@ -46,7 +46,7 @@ describe('App routing', () => {
 
   it('has a ticket creation page', () => {
     renderWithRoute('/tickets/new');
-    expect(screen.getByText(/creazione nuovo ticket/i)).toBeInTheDocument();
+    expect(screen.getByText(/^nuovo ticket$/i)).toBeInTheDocument();
   });
 
   it('has a ticket info page', () => {

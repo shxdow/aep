@@ -42,6 +42,7 @@ const TicketList = () => {
     <Page title="Elenco ticket">
       <Card
         title="Qui puoi vedere i tuoi ticket"
+        search={search}
         onSearchChange={setSearch}
         onCreate={createTicket}
         onEdit={viewTicket}

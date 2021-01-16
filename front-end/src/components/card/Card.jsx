@@ -9,6 +9,7 @@ const CardElenco = ({
   onEdit,
   onDelete,
   buttonsEnabled,
+  hideSearch,
   search,
   onSearchChange,
 }) => {
@@ -47,23 +48,27 @@ const CardElenco = ({
                       Modifica
                     </Button>
                   )}
-                  <Button
-                    data-testid="create-button"
-                    variant="outline-primary"
-                    onClick={onCreate}
-                  >
-                    Crea
-                  </Button>
+                  {onCreate && (
+                    <Button
+                      data-testid="create-button"
+                      variant="outline-primary"
+                      onClick={onCreate}
+                    >
+                      Crea
+                    </Button>
+                  )}
                 </ButtonGroup>
               </Col>
-              <Col>
-                <FormControl
-                  placeholder="Filtra..."
-                  value={search}
-                  onChange={handleSearchChange}
-                  style={{ minWidth: 200 }}
-                />
-              </Col>
+              {!hideSearch && (
+                <Col>
+                  <FormControl
+                    placeholder="Filtra..."
+                    value={search}
+                    onChange={handleSearchChange}
+                    style={{ minWidth: 200 }}
+                  />
+                </Col>
+              )}
             </Row>
           </Col>
         </Row>
