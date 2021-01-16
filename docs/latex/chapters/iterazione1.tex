@@ -20,6 +20,142 @@ linguaggio \textit{Python} e con il framework \textit{Django}, sia lato front-en
 
 \section{Back-end e REST API}
 
+Il back-end è un server REST realizzato grazie ai framework \textit{Django} e \textit{Django REST Framework},
+che si occupano rispettivamente della gestione completa\footnote{Comprendente accesso a database, templating, autorizzazioni, etc.}
+di un server in Python e della creazione e mantenimento di API Web.
+
+\subsection{Autenticazione}
+\label{sec:back-end-auth}
+
+L'autenticazione è gestita trasparentemente grazie a \textit{Django}, che offre tutte le possibili funzioni
+per la gestione di utenti e di sessioni.
+
+Come esempio, di seguito è visibile la definizione di un \texttt{Account}, entità usata per l'accesso al portale.
+
+\begin{lstlisting}[language=Python]
+from django.db import models
+from django.contrib.auth.models import User
+
+class Account(models.Model):
+    """
+        Account models
+    """
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=72, null=True)
+    email = models.CharField(max_length=72)
+\end{lstlisting}
+
+Come si può vedere, però, la classe \texttt{Account} non estende la classe predefinita \texttt{User},
+questo perché il framework stesso consiglia la creazione di un riferimento ad un'istanza di utente
+piuttosto che la classica ereditarietà\footnote{https://docs.djangoproject.com/en/3.1/topics/auth/customizing/}.
+
+Qui si vede inoltre perché (anticipato dal diagramma delle classi) non abbiamo chiamato \texttt{User}
+la classe relativa agli attori di tipo ``utente'', ovvero per evitare un conflitto di nomi con le classi
+fornite dal framework.
+
+Per limitare l'accesso invece a particolari endpoint viene fornito il decoratore \texttt{@login\_required},
+che va posto sopra le funzioni e/o metodi che necessitano di una sessione attiva, come si può qui vedere nell'estratto
+di codice.
+
+\begin{lstlisting}[language=Python]
+@login_required
+@api_view(['POST'])
+def add_operator(request):
+    """
+        Let admins add operator
+    """
+    try:
+        user = User.objects.create_user(username=request.data["username"],
+                                        password=request.data["password"])
+
+        user.save()
+        acc = Account(user=user, email=request.data["username"])
+        acc.save()
+        operator = Operator(account=acc, group=None)
+        operator.save()
+    except Exception as e:
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response(status=status.HTTP_201_CREATED)
+\end{lstlisting}
+
+\subsection{App AI}
+
+Una \textit{app} in \textit{Django} è un pacchetto Python che fornisce delle funzionalità e ha delle
+proprie configurazioni. Nel nostro caso, \texttt{ai} è la app principale (e anche l'unica) che offre tutte
+le funzionalità definite nella fase precedente.
+
+Seppur in \textit{Django} è possibile utilizzare dei \textit{template HTML} per la realizzazione anche
+dell'interfaccia grafica, essi non sono usati nel nostro progetto, in quanto il front-end è separato e
+realizzato in modo indipendente dal back-end.
+
+I file presenti di particolare interesse sono:
+\begin{itemize}
+  \item \texttt{models.py} che contiene tutti i modelli usati per derivare la struttura del database e le migrazioni;
+  \item \texttt{tests.py} contente i vari test;
+  \item \texttt{urls.py} per la definizione degli endpoint forniti;
+  \item \texttt{views.py}, il quale elenca le varie rappresentazioni dei dati e le azioni possibili su di essi.
+\end{itemize}
+
+Le relazioni statiche presenti nella app AI sono visibili in figura \ref{fig:app-ai-er}.
+Come si può vedere, sono presenti sia classi definite da noi sia classi del framework.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{app-ai-er.png}
+  \caption{Relazioni tra classi di AI}
+  \label{fig:app-ai-er}
+\end{figure}
+
+\subsection{Console di amministrazione}
+
+La console di amministrazione, usata dagli attori \textit{Amministratori}, è generata
+automaticamente dal framework \textit{Django} su un sottoinsieme delle entità da noi definite a livello di codice.
+
+Grazie ad essa è possibile
+
+\begin{itemize}
+  \item assegnare manualmente un operatore ad un gruppo;
+  \item assegnare manualmente un ticket ad un gruppo;
+  \item creare, modificare ed eliminare operatori ed i loro account.
+\end{itemize}
+
+Nella figura \ref{fig:django-admin-console} è visibile il form per l'accesso a questa console, disponibile all'endpoint \texttt{/admin/}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{django-admin-login.jpg}
+  \caption{Admin console di Django}
+  \label{fig:django-admin-console}
+\end{figure}
+
+\subsection{API endpoints}
+
+Il server mette a disposizione degli endpoint per fornire, creare e modificare i dati relativi al dominio.
+Questi sono visibili nella tabella \ref{tab:server-rest-apis}.
+
+\begin{table}
+  \centering
+  \begin{tabular}{|l|l|l|}
+    \hline Metodo & Endpoint & Funzione \\
+    \hline
+    \hline \texttt{POST} & \texttt{v1/auth/} & Login \\
+    \hline \texttt{POST} & \texttt{v1/signup/} & Registrazione \\
+    \hline \texttt{POST} & \texttt{v1/operator/add/} & Creazione di operatori \\
+    \hline \texttt{GET/PUT/DELETE} & \texttt{v1/operator/<int:pk>/} & Gestione di operatori \\
+    \hline \texttt{POST} & \texttt{v1/client/add/} & Creazione di clienti (i.e. utenti) \\
+    \hline \texttt{GET/PUT/DELETE} & \texttt{v1/client/<int:pk>/} & Gestione di clienti \\
+    \hline \texttt{POST} & \texttt{v1/group/add/} & Creazione di gruppi \\
+    \hline \texttt{GET/PUT/DELETE} & \texttt{v1/group/<int:pk>/} & Gestione di gruppi \\
+    \hline
+  \end{tabular}
+  \caption{API fornite dal server}
+  \label{tab:server-rest-apis}
+\end{table}
+
+Notare che questi endpoint sono solamente quelli realizzati in questa iterazione: nelle iterazioni future
+se ne aggiungeranno altri in base alle necessità implementative di ogni funzionalità.
+
 \section{Front-end}
 
 Il front-end è una \textit{Single Page Application} realizzata in \textit{JavaScript} con l'ausilio
@@ -43,14 +179,6 @@ Non appartenenti a questa cartella sono \texttt{App.jsx}, che si occupa del rend
 \texttt{AppRouting.jsx}, che definisce le varie rotte visitabili.
 
 \subsection{Pagine visitabili}
-
-\subsection{Admin console}
-
-La console di amministrazione, usata dagli attori \textit{Amministratori}, è generata
-automaticamente dal framework \textit{Django}.
-
-Grazie ad essa è possibile effettuare l'assegnamento manuale di operatori e ticket a dei gruppi,
-oltre alla gestione (tra cui creazione, modifica ed eliminazione) degli operatori stessi.
 
 \section{Analisi statica}
 
