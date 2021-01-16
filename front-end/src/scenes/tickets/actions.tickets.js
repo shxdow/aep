@@ -15,9 +15,41 @@ const getTickets = async () => {
   ];
 };
 
-const createTicket = async (title, content) => {
-  await axios.post(`${global.SERVER_ADDRESS}/tickets/add/`,
-    { title, content }, headers());
+const getTicketInfo = async (id) => {
+  // const { data } = await axios.get(`${global.SERVER_ADDRESS}/tickets/${id}`, headers());
+  // return data;
+  return {
+    id,
+    title: 'Qualcosa non funziona',
+    content: 'Non so reimpostare la password della app',
+    status: 'OP',
+    comments: [
+      { id: 1, user: 'Operatore 1', content: 'What' },
+      { id: 2, user: 'Operatore 1', content: 'What' },
+      { id: 3, user: 'Operatore 1', content: 'What' },
+    ],
+  };
 };
 
-export default { getTickets, createTicket };
+const createTicket = async (title, content) => {
+  await axios.post(
+    `${global.SERVER_ADDRESS}/tickets/add/`,
+    { title, content },
+    headers(),
+  );
+};
+
+const createComment = async (userId, ticketId, content) => {
+  await axios.post(
+    `${global.SERVER_ADDRESS}/comments/add/`,
+    { userId, ticketId, content },
+    headers(),
+  );
+};
+
+export default {
+  getTickets,
+  createTicket,
+  getTicketInfo,
+  createComment,
+};

@@ -8,9 +8,7 @@ import NotFound from './scenes/NotFound';
 import Signup from './scenes/signup';
 import { TicketInfo, TicketList, TicketNew } from './scenes/tickets';
 
-import withAuth from './withAuth';
-
-const AppRouting = () => (
+const AppRouting = ({ withAuth }) => (
   <Switch>
     <Route exact path="/" component={withAuth(Home)} />
     <Route exact path="/account" component={withAuth(Account)} />

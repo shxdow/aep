@@ -1,12 +1,16 @@
 import React from 'react';
 import { render, screen, act, wait, fireEvent, queryAllByAttribute } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
-import { Router } from 'react-router-dom';
+import { Router, Route } from 'react-router-dom';
 
 import '@testing-library/jest-dom/extend-expect';
 
-import TicketList from './TicketList';
-import TicketNew from './TicketNew';
+import {
+  TicketList,
+  TicketNew,
+  TicketInfo,
+} from './index';
+
 import { Status } from './constants.tickets';
 
 const waitForPainting = async (wrapper) => {
@@ -16,13 +20,25 @@ const waitForPainting = async (wrapper) => {
   });
 };
 
-const renderWithRouter = (content) => {
+const renderWithRouter = (content, route = null) => {
   const history = createMemoryHistory();
+  if (route) history.push(route)
   const wrapper = render(<Router history={history}>{content}</Router>);
   waitForPainting(wrapper);
   return { wrapper, history };
 };
 
+const renderTicketInfoPage = (id) => {
+  const history = createMemoryHistory();
+  history.push(`/tickets/${id}`);
+  const wrapper = render(
+    <Router history={history}>
+      <Route exact path="/tickets/:ticketId" component={TicketInfo} />
+    </Router>
+  );
+  waitForPainting(wrapper);
+  return { wrapper, history };
+}
 
 describe('Ticket list', () => {
   it('renders correctly', () => {
@@ -51,7 +67,7 @@ describe('Ticket list', () => {
   });
 });
 
-describe('Ticket creationg page', () => {
+describe('Ticket creation page', () => {
   it('renders correctly', () => {
     renderWithRouter(<TicketNew />);
   });
@@ -85,5 +101,19 @@ describe('Ticket creationg page', () => {
     fireEvent.change(content, { target: { value: 'Contenuto' } });
     fireEvent.blur(content, { name: 'contenuto' });
     fireEvent.click(screen.getByText(/crea ticket/i), { preventDefault: () => { } });
+  });
+});
+
+describe('Ticket info page', () => {
+  it('renders correctly', () => {
+    renderTicketInfoPage(1234);
+    expect(screen.getByText(/informazioni ticket 1234/i)).toBeInTheDocument();
+  });
+
+  it('can submit comments', () => {
+    renderTicketInfoPage(1234);
+    const comment = screen.getByPlaceholderText(/commenta qualcosa/i).closest('input');
+    fireEvent.change(comment, { target: { value: 'Commento' } });
+    fireEvent.click(screen.getByText(/^commenta$/i));
   });
 })
