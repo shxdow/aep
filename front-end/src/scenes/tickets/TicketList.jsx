@@ -8,6 +8,8 @@ import Table, { Column } from '../../components/table';
 import actions from './actions.tickets';
 import { Status } from './constants.tickets';
 
+const formatNumber = ({ value }) => `Numero ${value}`;
+
 const TicketList = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,9 +53,18 @@ const TicketList = () => {
           quickFilter={search}
           onRowSelected={handleSelection}
         >
-          <Column field="id" headerName="Numero" checkboxSelection />
+          <Column
+            field="id"
+            headerName="Numero"
+            checkboxSelection
+            valueFormatter={formatNumber}
+          />
           <Column field="title" headerName="Titolo" />
-          <Column field="status" headerName="Stato" valueFormatter={Status.format} />
+          <Column
+            field="status"
+            headerName="Stato"
+            valueFormatter={Status.format}
+          />
         </Table>
       </Card>
     </Page>

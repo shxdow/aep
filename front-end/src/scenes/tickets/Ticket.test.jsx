@@ -48,11 +48,4 @@ describe('Ticket list', () => {
     fireEvent.click(screen.getByTestId('create-button'));
     expect(h.location.pathname).toBe('/tickets/new');
   });
-
-  it('goes to the ticket edit page', () => {
-    const { wrapper, history: h } = renderWithRouter(<TicketList />);
-    const getCheckboxes = queryAllByAttribute.bind(null, 'type');
-    fireEvent.click(getCheckboxes(wrapper.container, 'checkbox')[0]);
-    fireEvent.click(screen.getByTestId('edit-button'));
-  });
 });

@@ -29,6 +29,7 @@ const Table = ({ children, data, loading, quickFilter, onRowSelected }) => {
     <div className="ag-theme-balham" style={dimensions}>
       <AgGridReact
         animateRows
+        suppressColumnVirtualisation
         rowSelection="single"
         onGridReady={onGridReady}
         quickFilterText={quickFilter}
