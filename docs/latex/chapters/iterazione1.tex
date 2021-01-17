@@ -50,8 +50,8 @@ Come si può vedere, però, la classe \texttt{Account} non estende la classe pre
 questo perché il framework stesso consiglia la creazione di un riferimento ad un'istanza di utente
 piuttosto che la classica ereditarietà\footnote{https://docs.djangoproject.com/en/3.1/topics/auth/customizing/}.
 
-Qui si vede inoltre perché (anticipato dal diagramma delle classi) non abbiamo chiamato \texttt{User}
-la classe relativa agli attori di tipo ``utente'', ovvero per evitare un conflitto di nomi con le classi
+Qui si vede inoltre perché, come anticipato dal diagramma delle classi, non abbiamo chiamato \texttt{User}
+la classe relativa agli attori di tipo ``utente'': per evitare un conflitto di nomi con le classi
 fornite dal framework.
 
 Per limitare l'accesso invece a particolari endpoint viene fornito il decoratore \texttt{@login\_required},
@@ -63,11 +63,10 @@ di codice.
 @api_view(['POST'])
 def add_operator(request):
     """
-        Let admins add operator
+        Let admins add operators
     """
     try:
-        user = User.objects.create_user(username=request.data["username"],
-                                        password=request.data["password"])
+        user = User.objects.create_user(username=request.data["username"], password=request.data["password"])
 
         user.save()
         acc = Account(user=user, email=request.data["username"])
@@ -102,7 +101,7 @@ Come si può vedere, sono presenti sia classi definite da noi sia classi del fra
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\linewidth]{app-ai-er.png}
+  \includegraphics[width=0.8\linewidth]{app-ai-er.png}
   \caption{Relazioni tra classi di AI}
   \label{fig:app-ai-er}
 \end{figure}
@@ -170,7 +169,7 @@ A sua volta, \texttt{src} è divisa in:
 
 \begin{itemize}
   \item \texttt{components}, contenente componenti di pura grafica, indipendenti da dati di dominio;
-  \item \texttt{resources}, per alcune risorse statiche (come ad esempio immagini);
+  \item \texttt{resources}, per alcune risorse statiche, come ad esempio immagini ed icone;
   \item \texttt{scenes}, che racchiude le varie pagine con cui l'utente interagisce;
   \item \texttt{theme}, per i CSS ed i font usati nel sito.
 \end{itemize}
