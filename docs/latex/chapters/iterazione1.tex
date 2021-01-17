@@ -1,0 +1,447 @@
+\section{Introduzione}
+
+In questa fase vengono implementate le strutture e le funzioni utili al fine di avere un
+\textit{Minimum Viable Product} funzionante.
+
+La funzione principale implementata è la \texttt{FU3}, ovvero il \textit{login} ed il \textit{logout}
+di persone con account (sia utenti sia operatori).
+Altre funzioni realizzate sono
+\begin{itemize}
+  \item \texttt{FU1}, la creazione di un account;
+  \item \texttt{FT7}, l'assegnamento manuale di un ticket;
+  \item \texttt{FO1}, la creazione di un operatore;
+  \item \texttt{FO2}, la modifica di un operatore;
+  \item \texttt{FO3}, l'eliminazione di un operatore.
+\end{itemize}
+
+Oltre all'autenticazione, è stata realizzata anche la struttura dell'applicazione sia lato back-end, in
+linguaggio \textit{Python} e con il framework \textit{Django}, sia lato front-end, usando i linguaggi
+\textit{JavaScript}, \textit{HTML} e \textit{CSS} e con la libreria \textit{React}.
+
+\section{Back-end e REST API}
+
+Il back-end è un server REST realizzato grazie ai framework \textit{Django} e \textit{Django REST Framework},
+che si occupano rispettivamente delle comuni necessità di un'applicazione web\footnote{Comprendente accesso a database, templating, autorizzazioni, etc.}.
+
+\subsection{Autenticazione}
+\label{sec:back-end-auth}
+
+L'autenticazione è gestita trasparentemente grazie a \textit{Django}, che offre tutte le possibili funzioni
+per la gestione di utenti e di sessioni.
+
+Come esempio, di seguito è visibile la definizione di un \texttt{Account}, entità usata per l'accesso al portale.
+
+\begin{lstlisting}[language=Python]
+from django.db import models
+from django.contrib.auth.models import User
+
+class Account(models.Model):
+    """
+        Account models
+    """
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=72, null=True)
+    email = models.CharField(max_length=72)
+\end{lstlisting}
+
+Come si può vedere, però, la classe \texttt{Account} non estende la classe predefinita \texttt{User},
+questo perché il framework stesso consiglia la creazione di un riferimento ad un'istanza di utente
+piuttosto che la classica ereditarietà\footnote{https://docs.djangoproject.com/en/3.1/topics/auth/customizing/}.
+
+Qui si vede inoltre perché, come anticipato dal diagramma delle classi, non abbiamo chiamato \texttt{User}
+la classe relativa agli attori di tipo ``utente'': per evitare un conflitto di nomi con le classi
+fornite dal framework.
+
+Per limitare l'accesso invece a particolari endpoint viene fornito il decoratore \texttt{@login\_required},
+che va posto sopra le funzioni e/o metodi che necessitano di una sessione attiva, come si può qui vedere nell'estratto
+di codice.
+
+\begin{lstlisting}[language=Python]
+@login_required
+@api_view(['POST'])
+def add_operator(request):
+    """
+        Let admins add operators
+    """
+    try:
+        user = User.objects.create_user(username=request.data["username"], password=request.data["password"])
+
+        user.save()
+        acc = Account(user=user, email=request.data["username"])
+        acc.save()
+        operator = Operator(account=acc, group=None)
+        operator.save()
+    except Exception as e:
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response(status=status.HTTP_201_CREATED)
+\end{lstlisting}
+
+\subsection{App AI}
+
+Una \textit{app} in \textit{Django} è un pacchetto Python che fornisce delle funzionalità e ha delle
+proprie configurazioni. Nel nostro caso, \texttt{ai} è la app principale (e anche l'unica) che offre tutte
+le funzionalità definite nella fase precedente.
+
+Seppur in \textit{Django} è possibile utilizzare dei \textit{template HTML} per la realizzazione anche
+dell'interfaccia grafica, essi non sono usati nel nostro progetto, in quanto il front-end è separato e
+realizzato in modo indipendente dal back-end.
+
+I file presenti di particolare interesse sono:
+\begin{itemize}
+  \item \texttt{models.py} che contiene tutti i modelli usati per derivare la struttura del database e le migrazioni;
+  \item \texttt{tests.py} contente i vari test;
+  \item \texttt{urls.py} per la definizione degli endpoint forniti;
+  \item \texttt{views.py}, il quale elenca le varie rappresentazioni dei dati e le azioni possibili su di essi.
+\end{itemize}
+
+Le relazioni statiche presenti nella app AI sono visibili in figura \ref{fig:app-ai-er}.
+Come si può vedere, sono presenti sia classi definite da noi sia classi del framework.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{app-ai-er.png}
+  \caption{Relazioni tra classi di AI}
+  \label{fig:app-ai-er}
+\end{figure}
+
+\subsection{Console di amministrazione}
+
+La console di amministrazione, usata dagli attori \textit{Amministratori}, è generata
+automaticamente dal framework \textit{Django} su un sottoinsieme delle entità da noi definite a livello di codice.
+
+Grazie ad essa è possibile
+
+\begin{itemize}
+  \item assegnare manualmente un operatore ad un gruppo;
+  \item assegnare manualmente un ticket ad un gruppo;
+  \item creare, modificare ed eliminare operatori ed i loro account.
+\end{itemize}
+
+Nella figura \ref{fig:django-admin-console} è visibile il form per l'accesso a questa console, disponibile all'endpoint \texttt{/admin/}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\linewidth]{django-admin-login.jpg}
+  \caption{Admin console di Django}
+  \label{fig:django-admin-console}
+\end{figure}
+
+\subsection{API endpoints}
+
+Il server mette a disposizione degli endpoint per fornire, creare e modificare i dati relativi al dominio.
+Questi sono visibili nella tabella \ref{tab:server-rest-apis}.
+
+\begin{table}
+  \centering
+  \begin{tabular}{|l|l|l|}
+    \hline Metodo & Endpoint & Funzione \\
+    \hline
+    \hline \texttt{POST} & \texttt{v1/auth/} & Login \\
+    \hline \texttt{POST} & \texttt{v1/signup/} & Registrazione \\
+    \hline \texttt{POST} & \texttt{v1/operator/add/} & Creazione di operatori \\
+    \hline \texttt{GET/PUT/DELETE} & \texttt{v1/operator/<int:pk>/} & Gestione di operatori \\
+    \hline \texttt{POST} & \texttt{v1/client/add/} & Creazione di clienti (i.e. utenti) \\
+    \hline \texttt{GET/PUT/DELETE} & \texttt{v1/client/<int:pk>/} & Gestione di clienti \\
+    \hline \texttt{POST} & \texttt{v1/group/add/} & Creazione di gruppi \\
+    \hline \texttt{GET/PUT/DELETE} & \texttt{v1/group/<int:pk>/} & Gestione di gruppi \\
+    \hline
+  \end{tabular}
+  \caption{API fornite dal server}
+  \label{tab:server-rest-apis}
+\end{table}
+
+Notare che questi endpoint sono solamente quelli realizzati in questa iterazione: nelle iterazioni future
+se ne aggiungeranno altri in base alle necessità implementative di ogni funzionalità.
+
+\section{Front-end}
+
+Il front-end è una \textit{Single Page Application} realizzata in \textit{JavaScript} con l'ausilio
+della libreria open source \textit{React}. Grazie ad essa è possibile costruire componenti grafici
+riutilizzabili, i quali possono anche contenere logica interna complessa.
+
+\subsection{Struttura SPA}
+
+Il codice è suddiviso in varie cartelle\footnote{La struttura del progetto non è data da un
+framework, ma da esperienza personale.}, ma la cartella \texttt{src} contiene tutto il codice.
+A sua volta, \texttt{src} è divisa in:
+
+\begin{itemize}
+  \item \texttt{components}, contenente componenti di pura grafica, indipendenti da dati di dominio;
+  \item \texttt{resources}, per alcune risorse statiche, come ad esempio immagini ed icone;
+  \item \texttt{scenes}, che racchiude le varie pagine con cui l'utente interagisce;
+  \item \texttt{theme}, per i CSS ed i font usati nel sito.
+\end{itemize}
+
+Non appartenenti a questa cartella sono \texttt{App.jsx}, che si occupa del rendering della SPA, e
+\texttt{AppRouting.jsx}, che definisce le varie rotte visitabili.
+
+\subsection{Pagine visitabili}
+
+Le pagine visitabili sono\footnote{La home, la pagina di account e le pagine relative ai ticket sono implementate in iterazioni future}
+
+\begin{itemize}
+  \item una pagina di \textit{login};
+  \item una pagina di \textit{registrazione};
+  \item una home;
+  \item una pagina per la visualizzazione dei propri dati;
+  \item pagine per la visualizzazione dei ticket, del loro stato e per l'inserimento di commenti.
+\end{itemize}
+
+Come esempio, in figura \ref{fig:page-signup} è visibile il form di registrazione utente.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{page-signup.jpg}
+  \caption{Pagina di registrazione}
+  \label{fig:page-signup}
+\end{figure}
+
+\section{Analisi statica}
+
+\subsection{Back-end}
+
+Per l'analisi statica del back-end sono stati usati diversi tool, dei quali il principale è \textit{pylint},
+un \textit{linter} configurabile per il linguaggio \textit{Python}.
+Esso mette a disposizione varie funzionalità:
+
+\begin{itemize}
+  \item imposizione di \textit{coding standards} e di \textit{code style};
+  \item \textit{error detection}, sia a livello sintattico sia a livelli di tipi;
+  \item \textit{refactoring} per codice non usato e/o duplicato;
+  \item integrazione con vari IDE al fine di fornire tutto ciò in tempo reale.
+\end{itemize}
+
+\textit{Pylint} è configurato tramite il file \texttt{.pylintrc} presente nella cartella del back-end,
+il quale contiene tutti parametri e le impostazioni da noi scelti per diminuire la complessità del codice
+ed aumentarne la chiarezza. È possibile utilizzare lo script \texttt{lint-backend.sh} per eseguire il linting del progetto.
+
+Oltre a \textit{warning} ed errori, nell'output è presente anche un singolo numero (su una scala da 1 a 10) che
+valuta il codice. In particolare, alla fine di questa iterazione questo valore è pari a $8.78$.
+
+\subsection{Front-end}
+
+Per il front-end è stata utilizzata \textit{ESLint}, una libreria JavaScript che analizza staticamente il codice e
+risolve problemi sia di stile, sia di code quality. 
+
+In particolare, \textit{ESLint} dà la possibilità di definire dei propri standard del codice, eventualmente derivandoli da altri standard.
+Ad esempio, lo standard da noi usato prende spunto dallo stile di \textit{Airbnb}.
+
+È possibile avere un report dell'analisi statica tramite il comando \texttt{yarn lint} nella cartella \texttt{front-end}.
+Gli specifici stili estesi e le regole sovrascritte sono invece visibili nel file \texttt{package.json}.
+
+\section{Analisi dinamica}
+
+\subsection{Testing}
+
+Ci siamo occupati di scrivere dei casi di test per poter avere una buona copertura del codice
+implementato in questa fase, sia lato front-end sia lato back-end.
+
+\subsubsection{Testing back-end}
+
+I casi di test sono definiti nel file \texttt{tests.py}. Il framework \textit{Django} mette a
+disposizione un package per la definizione di \textit{unit test}, ed in particolare offre la classe
+\texttt{TestCase} che è possibile estendere per definire casi di test personalizzati.
+
+I casi di test sono stati definiti su tutti i modelli e tutte le \textit{views} realizzati nell'iterazione.
+Come esempio, di seguito è visibile il caso di test per la gestione dell'autenticazione (commenti esclusi).
+
+\begin{lstlisting}[language=Python]
+class AuthTestCase(TestCase):
+  def setUp(self):
+      self.factory = RequestFactory()
+      self.user = User.objects.create_user(username='name', password='sur')
+
+  def test_auth(self):
+      request = self.factory.post('/auth/', {
+          'username': 'name',
+          'password': 'sur',
+      })
+
+  def test_logout(self):
+      request = self.factory.get('/logout/')
+\end{lstlisting}
+
+O ancora, i casi di test per gli endpoint relativi all'entità \texttt{Client}
+(rimossi commenti e docstring per brevità).
+
+\begin{lstlisting}[language=Python]
+class ClientTestCase(TestCase):
+  def setUp(self):
+      self.factory = RequestFactory()
+      self.user = User.objects.create_user(username='em@ma.il', password='sur')
+      self.user.save()
+      self.acc = Account(user=self.user, email='em@ma.il')
+      self.acc.save()
+      self.client = Client(account=self.acc)
+      self.client.save()
+
+  def test_delete_client(self):
+      request = self.factory.delete('/client/1/')
+      request.user = self.user
+      response = handle_client(request, 1)
+      self.assertEqual(response.status_code, 200)
+
+  def test_patch_client(self):
+      request = self.factory.patch('/client/1')
+      request.user = self.user
+      response = handle_client(request, 1)
+      self.assertEqual(response.status_code, 405)
+
+  def test_delete_fail_client(self):
+      request = self.factory.delete('/client/12345/')
+      request.user = self.user
+      response = handle_client(request, 12345)
+      self.assertEqual(response.status_code, 404)
+
+  def test_get_client(self):
+      request = self.factory.get('/client/1/')
+      request.user = self.user
+      response = handle_client(request, 1)
+      self.assertEqual(response.status_code, 200)
+
+  def test_get_fail_client(self):
+      request = self.factory.get('/client/12345/')
+      request.user = self.user
+      response = handle_client(request, 12345)
+      self.assertEqual(response.status_code, 404)
+
+  def test_put_client(self):
+      request = self.factory.put('/client/1/', {
+          "account": {
+              'id': 1,
+              'email': 'changed@ma.il'
+          },
+      }, content_type='application/json')
+      request.user = self.user
+      response = handle_client(request, 1)
+      self.assertEqual(response.status_code, 200)
+
+  def test_add_client(self):
+      request = self.factory.post('/client/add/', {
+          "username": "op",
+          "password": "psw"
+      })
+
+      request.user = self.user
+      response = add_client(request)
+      self.assertEqual(response.status_code, 201)
+
+  def test_add_fail_client(self):
+      request = self.factory.post('/client/add', {
+          "noparam": "op",
+          "password": "psw"
+      })
+
+      request.user = self.user
+      response = add_client(request)
+      self.assertEqual(response.status_code, 500)
+\end{lstlisting}
+
+\subsubsection{Testing front-end}
+
+Lato front-end, è stato usato il framework \textit{Jest} e la libreria \textit{testing-library} al fine di
+esaminare il più possibile la struttura ed il comportamento dell'applicazione web.
+
+Il framework \textit{Jest} riconosce in automatico tutti i file \texttt{Name.test.js} come dei file contenenti
+casi di test, li analizza e li esegue tutti in automatico, a qualsiasi livello essi si trovino.
+
+Ad esempio, un estratto del file \texttt{AppRouting.test.jsx} è visibile nel seguente snippet.
+
+\begin{lstlisting}
+describe('App routing', () => {
+  it('has a home page', () => {
+    renderWithRoute('/');
+    expect(screen.getByText(/home/i)).toBeInTheDocument();
+  });
+
+  it('has an account page', () => {
+    renderWithRoute('/account');
+    screen.getAllByText(/account/i).forEach((x) => expect(x).toBeInTheDocument());
+  });
+
+  it('has a 404 page', () => {
+    renderWithRoute('/some/random/route');
+    expect(screen.getByText(/404/i)).toBeInTheDocument();
+  });
+});
+\end{lstlisting}
+
+Tramite la libreria di testing usata è possibile anche simulare inserimenti e click dell'utente,
+come è visibile in questo estratto di \texttt{Login.test.jsx}.
+
+\begin{lstlisting}
+describe('Login page', () => {
+  it('has a username input', () => {
+    renderWithHistory(<Login />);
+    expect(screen.getByPlaceholderText('Inserisci il nome utente')).toBeInTheDocument();
+  });
+
+  it('has a password input', () => {
+    renderWithHistory(<Login />);
+    expect(screen.getByPlaceholderText('Inserisci la password')).toBeInTheDocument();
+  });
+
+  it('correctly accepts inputs', () => {
+    renderWithHistory(<Login />);
+    fireEvent.change(
+      screen.getByPlaceholderText('Inserisci il nome utente'),
+      { target: { value: 'username' } },
+    );
+    fireEvent.change(
+      screen.getByPlaceholderText('Inserisci la password'),
+      { target: { value: 'password123' } },
+    );
+    fireEvent.click(screen.getByTestId('login-button'));
+  });
+});
+\end{lstlisting}
+
+\subsection{Coverage}
+
+\subsubsection{Back-end}
+
+Per il back-end è stato usato \textit{Coverage.py}, uno strumento atto a misurare la copertura del
+codice per il linguaggio Python. È anche disponibile un output interattivo in HTML, il cui output per il
+codice di questa iterazione è visibile in figura \ref{fig:back-end-coverage-it1}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth]{back-end-coverage-it1.jpg}
+  \caption{Back-end code coverage}
+  \label{fig:back-end-coverage-it1}
+\end{figure}
+
+Se si desidera, è possibile utilizzare lo script \texttt{coverage-backend.sh} per generare i report HTML
+nella cartella \texttt{back-end/htmlcov}.
+
+\subsubsection{Front-end}
+
+Il framework di testing \textit{Jest} permette anche di generare automaticamente la coverage del codice tramite il comando
+\texttt{yarn coverage}, esplorabile interattivamente tramite un documento HTML.
+In figura \ref{fig:code-coverage-front-end-it1} è visibile la pagina principale di questo documento, che
+presenta la copertura di istruzioni, branches, funzioni e righe per ogni cartella del progetto.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{front-end-coverage-it1.jpg}
+  \caption{Front-end code coverage}
+  \label{fig:code-coverage-front-end-it1}
+\end{figure}
+
+In totale, secondo questo primo calcolo, la coverage assume i valori visibili in tabella \ref{tab:code-coverage-front-end-it1}.
+
+\begin{table}
+  \centering
+  \begin{tabular}{|l|r|}
+    \hline Metrica & Copertura percentuale \\
+    \hline
+    \hline Istruzioni & $91.30\%$ \\
+    \hline Branches   & $85.71\%$ \\
+    \hline Funzioni   & $97.67\%$ \\
+    \hline Righe      & $90.91\%$ \\
+    \hline
+  \end{tabular}
+  \caption{Coverage totale per il front-end}
+  \label{tab:code-coverage-front-end-it1}
+\end{table}
