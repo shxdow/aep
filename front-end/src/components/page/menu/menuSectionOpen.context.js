@@ -2,7 +2,7 @@ import React from 'react';
 
 const MenuSectionOpen = React.createContext({
   sectionOpen: '',
-  setSectionOpen: () => null,
+  setSectionOpen: null,
 });
 
 export default MenuSectionOpen;

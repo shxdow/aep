@@ -5,20 +5,23 @@ import Account from './scenes/account';
 import Home from './scenes/home';
 import Login from './scenes/login';
 import NotFound from './scenes/NotFound';
+import Signup from './scenes/signup';
 import TicketInfo from './scenes/ticket-info';
 import TicketList from './scenes/ticket-list';
 import TicketNew from './scenes/ticket-new';
-import Registration from './scenes/registration';
+
+import withAuth from './withAuth';
 
 const AppRouting = () => (
   <Switch>
-    <Route exact path="/" component={Home} />
-    <Route exact path="/account" component={Account} />
-    <Route exact path="/account/new" component={Registration} />
+    <Route exact path="/" component={withAuth(Home)} />
+    <Route exact path="/account" component={withAuth(Account)} />
+    <Route exact path="/tickets" component={withAuth(TicketList)} />
+    <Route exact path="/tickets/new" component={withAuth(TicketNew)} />
+    <Route exact path="/tickets/:ticketId" component={withAuth(TicketInfo)} />
+
     <Route exact path="/login" component={Login} />
-    <Route exact path="/tickets" component={TicketList} />
-    <Route exact path="/tickets/new" component={TicketNew} />
-    <Route exact path="/tickets/:ticketId" component={TicketInfo} />
+    <Route exact path="/signup" component={Signup} />
 
     <Route path="/" component={NotFound} />
   </Switch>

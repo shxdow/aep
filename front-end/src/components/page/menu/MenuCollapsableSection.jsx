@@ -12,8 +12,14 @@ const MenuCollapsableSection = ({ id, icon, text, children }) => {
     setSectionOpen(id);
   }, [setSectionOpen, id]);
 
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === 'Enter') {
+      toggleSection();
+    }
+  }, [toggleSection]);
+
   return (
-    <li className="nav-item" onClick={toggleSection}>
+    <li className="nav-item" onClick={toggleSection} onKeyDown={handleKeyDown}>
       {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
       <a data-toggle="collapse" className={`nav-link ${open ? 'active' : 'collapsed'}`}>
         {icon && <i className={icon} />}
