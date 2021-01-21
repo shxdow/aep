@@ -238,7 +238,7 @@ def handle_comment(request, pk):
 
 
 @login_required
-@api_view(['GET'])
+@api_view(['GET', 'PUT'])
 def handle_ticket(request, pk):
     """
         Handle ticket endpoints:
@@ -250,6 +250,19 @@ def handle_ticket(request, pk):
             ticket = model_to_dict(Ticket.objects.get(pk=pk))
             return Response(ticket)
         except Ticket.DoesNotExist as ex:
+            raise Http404 from ex
+    elif request.method == 'PUT':
+        try:
+            acc = Account.objects.get(user__username=request.user.username)
+            if Operator.objects.filter(account=acc) is None:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+            ticket = Ticket.objects.filter(pk=request.data["id"]).update(
+                status=request.data["status"])
+
+            ticket.save()
+            return Response(status=status.HTTP_200_OK)
+        except Client.DoesNotExist as ex:
             raise Http404 from ex
     else:
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
