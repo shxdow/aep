@@ -14,13 +14,10 @@ const Menu = () => {
     setSectionOpen((prevSection) => (prevSection === newSection ? '' : newSection));
   }, []);
 
-  const value = useMemo(
-    () => ({
-      sectionOpen,
-      setSectionOpen: updateSection,
-    }),
-    [updateSection, sectionOpen]
-  );
+  const value = useMemo(() => ({
+    sectionOpen,
+    setSectionOpen: updateSection,
+  }), [updateSection, sectionOpen]);
 
   return (
     <MenuSectionOpenContext.Provider value={value}>
@@ -30,7 +27,7 @@ const Menu = () => {
             <div className="sidebar-brand-icon">
               <i className="fa fa-clipboard-list" />
             </div>
-            <div className="sidebar-brand-text mx-3">Ticketing</div>
+            <div className="sidebar-brand-text mx-3">AI Ticketing</div>
           </div>
         </Link>
 

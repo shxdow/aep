@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import Cookies from 'js-cookie';
 import { Navbar, Nav } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 
@@ -11,7 +12,7 @@ const TopBar = ({ title }) => {
   }, []);
 
   const logout = useCallback(async () => {
-    // TODO: logout
+    Cookies.remove('token');
     history.push('/login');
   }, [history]);
 

@@ -1,15 +1,16 @@
 \documentclass[a4paper,12pt,openright]{report}
 
 \usepackage[T1]{fontenc}
-% \usepackage[backend=biber]{biblatex}
+\usepackage[backend=biber,sorting=none]{biblatex}
 \usepackage[hidelinks]{hyperref}
 \usepackage[italian]{babel}
 \usepackage[utf8]{inputenc}
-% \usepackage{csquotes}
+\usepackage{csquotes}
 \usepackage{array}
 \usepackage{float}
 \usepackage{graphicx}
 \usepackage{import}
+\usepackage{listings}
 
 \graphicspath{{./images/}}
 
@@ -17,8 +18,13 @@
 \setlength{\parskip}{0.3cm}
 \renewcommand{\arraystretch}{1.2}
 
+\lstset{
+  breaklines=true,
+  upquote=true,
+}
+
 % ==== BIBLIOGRAPHY ====
-%\addbibresource{bibliografia.bib}
+\addbibresource{bibliography.bib}
 
 % ==== REAL DOCUMENT BEGINS HERE ====
 \title{%
@@ -59,8 +65,12 @@
   \chapter{Iterazione 0}
   \import{chapters/}{iterazione0.tex}
 
-  %  \nocite{*}
-  %  \printbibliography[heading=bibintoc]
-  %  \thispagestyle{fancy}
+  \chapter{Iterazione 1}
+  \import{chapters/}{iterazione1.tex}
+
+
+  % ------ BIBLIOGRAFIA
+   \nocite{*}
+   \printbibliography[heading=bibintoc]
 
 \end{document}

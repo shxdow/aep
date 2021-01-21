@@ -1,5 +1,5 @@
 django
 djangorestframework
-pyverse
+django-extensions
 pylint
 pylint-django
