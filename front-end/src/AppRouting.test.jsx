@@ -55,7 +55,7 @@ describe('App routing', () => {
 
   it('has a ticket info page', () => {
     renderWithRoute('/tickets/1234');
-    expect(screen.getByText(/informazioni ticket/i)).toBeInTheDocument();
+    expect(screen.queryByText(/404/i)).toBeNull();
   });
 
   it('has a login page', () => {

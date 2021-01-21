@@ -9,6 +9,12 @@ const login = async (username, password) => {
 
   Cookies.set('token', data.token);
   Cookies.set('username', username);
+  if (data.account) {
+    Cookies.set('account', data.account);
+  }
+  if (data.client) {
+    Cookies.set('client', data.client);
+  }
 };
 
 export default { login };

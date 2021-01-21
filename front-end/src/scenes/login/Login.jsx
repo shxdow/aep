@@ -45,7 +45,6 @@ const Login = () => {
       setLoading(true);
       try {
         await actions.login(username, password);
-        sessionStorage.setItem('username', username);
         setLoading(false);
         history.push('/');
       } catch (ex) {

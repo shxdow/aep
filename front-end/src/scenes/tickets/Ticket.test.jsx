@@ -10,6 +10,7 @@ import {
   TicketNew,
   TicketInfo,
 } from './index';
+import TicketInfoGraphics from './TicketInfoGraphics';
 
 import { Status } from './constants.tickets';
 
@@ -28,12 +29,12 @@ const renderWithRouter = (content, route = null) => {
   return { wrapper, history };
 };
 
-const renderTicketInfoPage = (id) => {
+const renderTicketInfoPage = (id, component) => {
   const history = createMemoryHistory();
   history.push(`/tickets/${id}`);
   const wrapper = render(
     <Router history={history}>
-      <Route exact path="/tickets/:ticketId" component={TicketInfo} />
+      <Route exact path="/tickets/:ticketId" component={component} />
     </Router>
   );
   waitForPainting(wrapper);
@@ -106,12 +107,12 @@ describe('Ticket creation page', () => {
 
 describe('Ticket info page', () => {
   it('renders correctly', () => {
-    renderTicketInfoPage(1234);
+    renderTicketInfoPage(1234, TicketInfo);
     expect(screen.getByText(/informazioni ticket 1234/i)).toBeInTheDocument();
   });
 
   it('can submit comments', () => {
-    renderTicketInfoPage(1234);
+    renderTicketInfoPage(1234, () => <TicketInfoGraphics ticketInfo={{ comments: [] }} />);
     const comment = screen.getByPlaceholderText(/commenta qualcosa/i).closest('input');
     fireEvent.change(comment, { target: { value: 'Commento' } });
     fireEvent.click(screen.getByText(/^commenta$/i));

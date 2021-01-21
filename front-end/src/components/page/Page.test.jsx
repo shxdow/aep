@@ -1,4 +1,5 @@
 import React from 'react';
+import Cookies from 'js-cookie';
 import { render, screen } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
@@ -27,7 +28,7 @@ describe('TopBar', () => {
   });
 
   it('has the correct username', () => {
-    sessionStorage.setItem('username', 'Quick brown fox');
+    Cookies.set('username', 'Quick brown fox');
     renderWithRouter(<TopBar title="Test" />);
     expect(screen.getByText(/quick brown fox/i)).toBeInTheDocument();
   });

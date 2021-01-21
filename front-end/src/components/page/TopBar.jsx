@@ -8,12 +8,14 @@ const TopBar = ({ title }) => {
   const history = useHistory();
 
   useEffect(() => {
-    setUsername(sessionStorage.getItem('username') || 'Utente');
+    setUsername(Cookies.get('username') || 'Utente');
   }, []);
 
   const logout = useCallback(async () => {
     Cookies.remove('token');
-    sessionStorage.removeItem('username');
+    Cookies.remove('username');
+    Cookies.remove('account');
+    Cookies.remove('client');
     history.push('/login');
   }, [history]);
 
