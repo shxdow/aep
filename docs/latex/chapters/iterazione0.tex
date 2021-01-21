@@ -368,6 +368,10 @@ Le classi \textit{Handler} si occupano della comunicazione con il client e imple
 La classe \textit{TicketClassifier} implementa invece l'algoritmo per la classificazione dei ticket ed il loro assegnamento ai gruppi
 di operatori.
 
+Notare che la nostra classe \texttt{Client} fa riferimento all'attore di tipo ``utente'': questo perché
+\texttt{User} fa riferimento ad una classe già esistente e fornita dal framework, come sarà visibile nella sezione
+\ref{sec:back-end-auth}.
+
 \section{Architettura hardware}
 
 L'architettura del sistema è una \textit{2-tier architecture}, composta da un client per la GUI e l'interazione con l'utente e da un server
