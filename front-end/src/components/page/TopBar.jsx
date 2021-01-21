@@ -13,6 +13,7 @@ const TopBar = ({ title }) => {
 
   const logout = useCallback(async () => {
     Cookies.remove('token');
+    sessionStorage.removeItem('username');
     history.push('/login');
   }, [history]);
 
