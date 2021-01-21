@@ -18,6 +18,8 @@ urlpatterns = [
     path('v1/client/<int:pk>/', views.handle_client),
     path('v1/group/add/', views.add_group),
     path('v1/group/<int:pk>/', views.handle_group),
-    #  path('v1/ticket/add/', views.add_ticket),
-    #  path('v1/ticket/<int:pk>/', views.handle_ticket),
+    path('v1/ticket/add/', views.add_ticket),
+    path('v1/ticket/<int:pk>/', views.handle_ticket),
+    path('v1/comment/add/', views.add_comment),
+    path('v1/comment/<int:pk>/', views.handle_comment),
 ]
