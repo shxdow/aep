@@ -4,7 +4,7 @@
 
 from django.contrib.auth import authenticate, login, logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
@@ -65,8 +65,14 @@ def add_operator(request):
         Let admins add operator
     """
     try:
+        acc = Account.objects.get(user__username=request.user.username)
+        if Operator.objects.filter(account=acc) is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         user = User.objects.create_user(username=request.data["username"],
                                         password=request.data["password"])
+
+        group = Group(name="Operator")
+        user.groups.add(group)
 
         user.save()
         acc = Account(user=user, email=request.data["username"])
@@ -253,8 +259,7 @@ def handle_ticket(request, pk):
             raise Http404 from ex
     elif request.method == 'PUT':
         try:
-            acc = Account.objects.get(user__username=request.user.username)
-            if Operator.objects.filter(account=acc) is None:
+            if not request.user.groups.filter(name="Operator").exists():
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
 
             ticket = Ticket.objects.filter(pk=request.data["id"]).update(
