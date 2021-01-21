@@ -13,7 +13,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import Ticket, Group, Operator, Account, Client
+from .models import Ticket, Group, Operator, Account, Client, Comment
 
 
 @csrf_exempt
@@ -93,6 +93,43 @@ def add_client(request):
         acc.save()
         client = Client(account=acc)
         client.save()
+    except Exception as e:
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response(status=status.HTTP_201_CREATED)
+
+
+@login_required
+@api_view(['POST'])
+def add_ticket(request):
+    """
+        Let someone add a ticket
+    """
+    try:
+        ticket = Ticket.objects.create(title=request.data["title"],
+                                       description=request.data["description"],
+                                       status=request.data["status"],
+                                       group=request.data["group"],
+                                       client=request.data["client"])
+
+        ticket.save()
+    except Exception as e:
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response(status=status.HTTP_201_CREATED)
+
+
+@login_required
+@api_view(['POST'])
+def add_comment(request):
+    """
+        Let someone leave a comment to a ticket
+    """
+    try:
+        comment = Comment.objects.create(timestamp=request.data["timestamp"],
+                                         ticket=request.data["ticket"],
+                                         account=request.data["account"],
+                                         content=request.data["content"])
+
+        comment.save()
     except Exception as e:
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(status=status.HTTP_201_CREATED)
@@ -180,6 +217,42 @@ def handle_operator(request, pk):
             return Response(status=status.HTTP_200_OK)
         except Operator.DoesNotExist as ex:
             raise Http404 from ex
+
+
+@login_required
+@api_view(['GET'])
+def handle_comment(request, pk):
+    """
+        Handle comment endpoints:
+            - Get: get a comment with id = pk
+    """
+
+    if request.method == 'GET':
+        try:
+            ticket = model_to_dict(Comment.objects.get(pk=pk))
+            return Response(ticket)
+        except Comment.DoesNotExist as ex:
+            raise Http404 from ex
+    else:
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@login_required
+@api_view(['GET'])
+def handle_ticket(request, pk):
+    """
+        Handle ticket endpoints:
+            - Get: get a ticket with id = pk
+    """
+
+    if request.method == 'GET':
+        try:
+            ticket = model_to_dict(Ticket.objects.get(pk=pk))
+            return Response(ticket)
+        except Ticket.DoesNotExist as ex:
+            raise Http404 from ex
+    else:
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @login_required
