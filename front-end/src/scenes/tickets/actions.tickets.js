@@ -23,12 +23,21 @@ const getTicketInfo = async (id) => {
     title: 'Qualcosa non funziona',
     content: 'Non so reimpostare la password della app',
     status: 'OP',
+    group: null,
     comments: [
       { id: 1, user: 'Operatore 1', content: 'What' },
       { id: 2, user: 'Operatore 1', content: 'What' },
       { id: 3, user: 'Operatore 1', content: 'What' },
     ],
   };
+};
+
+const changeTicketStatus = async (id, status) => {
+  await axios.put(
+    `${global.SERVER_ADDRESS}/tickets/change_status/`,
+    { id, status },
+    headers(),
+  );
 };
 
 const createTicket = async (title, content) => {
@@ -52,4 +61,5 @@ export default {
   createTicket,
   getTicketInfo,
   createComment,
+  changeTicketStatus,
 };

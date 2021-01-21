@@ -10,6 +10,7 @@
 .ticket-info {
   display: flex;
   width: 100%;
+  margin-bottom: 10px;
 }
 
 .ticket-info-label {
@@ -20,6 +21,11 @@
 .ticket-info-content {
   flex-grow: 1;
   font-style: italic;
+}
+
+.ticket-info-control {
+  flex-grow: 1;
+  max-width: 200px;
 }
 
 .ticket-comment {

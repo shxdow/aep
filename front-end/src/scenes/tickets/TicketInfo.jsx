@@ -1,5 +1,6 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import Cookies from 'js-cookie';
+import Select from 'react-select';
 import { useParams } from 'react-router-dom';
 import { ProgressBar, Form, Button, Alert } from 'react-bootstrap';
 
@@ -12,13 +13,26 @@ import { Status } from './constants.tickets';
 
 import './tickets.css';
 
+const statusOptions = [
+  Status.Open,
+  Status.Triaged,
+  Status.Progress,
+  Status.Closed,
+].map((value) => ({
+  label: Status.format({ value }), value,
+}));
+
 const TicketInfo = () => {
   const [ticketInfo, setTicketInfo] = useState(null);
   const [comment, setComment] = useState('');
+  const [isOperator, setIsOperator] = useState(false);
+
   const [loading, setLoading] = useState(true);
-  const [commentLoading, setCommentLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
   const [error, setError] = useState('');
   const [commentError, setCommentError] = useState('');
+
   const { ticketId } = useParams();
 
   const loadTicketInfo = useCallback(() => {
@@ -29,31 +43,37 @@ const TicketInfo = () => {
       .finally(() => setLoading(false));
   }, [ticketId]);
 
-  const submitComment = useCallback(async (e) => {
+  const submitComment = useCallback((e) => {
     e.preventDefault();
 
     if (!comment) return;
 
-    setCommentLoading(true);
-    try {
-      await actions.createComment(
-        Cookies.get('username'),
-        ticketId,
-        comment,
-      );
-      loadTicketInfo();
-    } catch (ex) {
-      setCommentError(ex.message);
-    } finally {
-      setCommentLoading(false);
-    }
+    setSubmitting(true);
+    actions.createComment(Cookies.get('username'), ticketId, comment)
+      .then(loadTicketInfo)
+      .catch((ex) => setCommentError(ex.message))
+      .finally(() => setSubmitting(false));
   }, [ticketId, comment, loadTicketInfo]);
 
   const updateComment = useCallback((e) => {
     setComment(e.target.value);
   }, []);
 
+  const updateStatus = useCallback(({ value }) => {
+    const previousStatus = ticketInfo?.status;
+    setTicketInfo((prev) => ({ ...prev, status: value }));
+    actions
+      .changeTicketStatus(ticketId, value)
+      .catch(() => setTicketInfo((prev) => ({ ...prev, status: previousStatus })));
+  }, [ticketId, ticketInfo?.status]);
+
+  const selectedStatus = useMemo(
+    () => statusOptions.filter((x) => x.value === ticketInfo?.status),
+    [ticketInfo?.status],
+  );
+
   useEffect(() => {
+    setIsOperator(true);
     if (!ticketId) return;
     loadTicketInfo();
   }, [ticketId, loadTicketInfo]);
@@ -61,9 +81,10 @@ const TicketInfo = () => {
   return (
     <Page title={`Informazioni ticket ${ticketId}`}>
       <Card title="Informazioni del ticket" hideSearch>
-        {loading
+        {loading && <ProgressBar now={100} animated />}
+        {!loading && !ticketInfo
           ? (
-            <ProgressBar now={100} animated />
+            'Sembra non esserci nessun ticket...'
           ) : (
             <>
               {error && <Alert variant="danger">{error}</Alert>}
@@ -73,15 +94,32 @@ const TicketInfo = () => {
               </div>
               <div className="ticket-info">
                 <div className="ticket-info-label">Titolo</div>
-                <div className="ticket-info-content">{ticketInfo.title}</div>
+                <div className="ticket-info-content">{ticketInfo?.title}</div>
               </div>
               <div className="ticket-info">
                 <div className="ticket-info-label">Contenuto</div>
-                <div className="ticket-info-content">{ticketInfo.content}</div>
+                <div className="ticket-info-content">{ticketInfo?.content}</div>
+              </div>
+              <div className="ticket-info">
+                <div className="ticket-info-label">Gruppo</div>
+                <div className="ticket-info-content">{ticketInfo?.group || 'Nessuno'}</div>
               </div>
               <div className="ticket-info">
                 <div className="ticket-info-label">Stato</div>
-                <div className="ticket-info-content">{Status.format({ value: ticketInfo.status })}</div>
+                {isOperator
+                  ? (
+                    <div className="ticket-info-control">
+                      <Select
+                        options={statusOptions}
+                        onChange={updateStatus}
+                        value={selectedStatus}
+                      />
+                    </div>
+                  ) : (
+                    <div className="ticket-info-content">
+                      {Status.format({ value: ticketInfo?.status }) || 'Nessuno'}
+                    </div>
+                  )}
               </div>
             </>
           )}
@@ -125,9 +163,9 @@ const TicketInfo = () => {
                 size="lg"
                 className="text-uppercase slim-button"
                 onClick={submitComment}
-                disabled={commentLoading || !comment}
+                disabled={submitting || !comment}
               >
-                {commentLoading ? '...' : 'Commenta'}
+                {submitting ? '...' : 'Commenta'}
               </Button>
             </div>
             <div className="col-12">
