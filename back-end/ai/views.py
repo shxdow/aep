@@ -4,7 +4,7 @@
 
 from django.contrib.auth import authenticate, login, logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
@@ -13,7 +13,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import Ticket, Group, Operator, Account, Client
+from .models import Ticket, Group, Operator, Account, Client, Comment
 
 
 @csrf_exempt
@@ -65,8 +65,14 @@ def add_operator(request):
         Let admins add operator
     """
     try:
+        acc = Account.objects.get(user__username=request.user.username)
+        if Operator.objects.filter(account=acc) is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         user = User.objects.create_user(username=request.data["username"],
                                         password=request.data["password"])
+
+        group = Group(name="Operator")
+        user.groups.add(group)
 
         user.save()
         acc = Account(user=user, email=request.data["username"])
@@ -93,6 +99,43 @@ def add_client(request):
         acc.save()
         client = Client(account=acc)
         client.save()
+    except Exception as e:
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response(status=status.HTTP_201_CREATED)
+
+
+@login_required
+@api_view(['POST'])
+def add_ticket(request):
+    """
+        Let someone add a ticket
+    """
+    try:
+        ticket = Ticket.objects.create(title=request.data["title"],
+                                       description=request.data["description"],
+                                       status=request.data["status"],
+                                       group=request.data["group"],
+                                       client=request.data["client"])
+
+        ticket.save()
+    except Exception as e:
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response(status=status.HTTP_201_CREATED)
+
+
+@login_required
+@api_view(['POST'])
+def add_comment(request):
+    """
+        Let someone leave a comment to a ticket
+    """
+    try:
+        comment = Comment.objects.create(timestamp=request.data["timestamp"],
+                                         ticket=request.data["ticket"],
+                                         account=request.data["account"],
+                                         content=request.data["content"])
+
+        comment.save()
     except Exception as e:
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(status=status.HTTP_201_CREATED)
@@ -180,6 +223,54 @@ def handle_operator(request, pk):
             return Response(status=status.HTTP_200_OK)
         except Operator.DoesNotExist as ex:
             raise Http404 from ex
+
+
+@login_required
+@api_view(['GET'])
+def handle_comment(request, pk):
+    """
+        Handle comment endpoints:
+            - Get: get a comment with id = pk
+    """
+
+    if request.method == 'GET':
+        try:
+            ticket = model_to_dict(Comment.objects.get(pk=pk))
+            return Response(ticket)
+        except Comment.DoesNotExist as ex:
+            raise Http404 from ex
+    else:
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@login_required
+@api_view(['GET', 'PUT'])
+def handle_ticket(request, pk):
+    """
+        Handle ticket endpoints:
+            - Get: get a ticket with id = pk
+    """
+
+    if request.method == 'GET':
+        try:
+            ticket = model_to_dict(Ticket.objects.get(pk=pk))
+            return Response(ticket)
+        except Ticket.DoesNotExist as ex:
+            raise Http404 from ex
+    elif request.method == 'PUT':
+        try:
+            if not request.user.groups.filter(name="Operator").exists():
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+            ticket = Ticket.objects.filter(pk=request.data["id"]).update(
+                status=request.data["status"])
+
+            ticket.save()
+            return Response(status=status.HTTP_200_OK)
+        except Client.DoesNotExist as ex:
+            raise Http404 from ex
+    else:
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @login_required
