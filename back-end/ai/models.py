@@ -62,7 +62,7 @@ class Ticket(models.Model):
     status = models.CharField(max_length=2,
                               choices=STATUS_OPTIONS,
                               default=OPEN)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
 
 

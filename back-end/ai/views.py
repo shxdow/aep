@@ -44,7 +44,23 @@ def auth(request):
                         password=request.data["password"])
     if user is not None:
         login(request, user)
-        return Response(status=status.HTTP_200_OK)
+        try:
+            user_account = user.account
+        except:
+            user_account = None
+
+        if user_account is None:
+            return Response(status=status.HTTP_200_OK)
+
+        try:
+            client = Client.objects.get(account=user.account.id).id
+        except:
+            client = None
+
+        return Response({
+            'client': client,
+            'account': user.account.id,
+        })
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -113,9 +129,7 @@ def add_ticket(request):
     try:
         ticket = Ticket.objects.create(title=request.data["title"],
                                        description=request.data["description"],
-                                       status=request.data["status"],
-                                       group=request.data["group"],
-                                       client=request.data["client"])
+                                       client=Client.objects.get(pk=request.data["client"]))
 
         ticket.save()
     except Exception as e:
@@ -130,9 +144,11 @@ def add_comment(request):
         Let someone leave a comment to a ticket
     """
     try:
+        account = Account.objects.get(pk=request.data["account"])
+        ticket = Ticket.objects.get(pk=request.data["ticket"])
         comment = Comment.objects.create(timestamp=request.data["timestamp"],
-                                         ticket=request.data["ticket"],
-                                         account=request.data["account"],
+                                         ticket=ticket,
+                                         account=account,
                                          content=request.data["content"])
 
         comment.save()
@@ -244,6 +260,15 @@ def handle_comment(request, pk):
 
 
 @login_required
+@api_view(['GET'])
+def get_tickets(request):
+    """
+        Get all tickets in the database
+    """
+    return Response(list(map(model_to_dict, Ticket.objects.all())))
+
+
+@login_required
 @api_view(['GET', 'PUT'])
 def handle_ticket(request, pk):
     """
@@ -254,7 +279,20 @@ def handle_ticket(request, pk):
     if request.method == 'GET':
         try:
             ticket = model_to_dict(Ticket.objects.get(pk=pk))
-            return Response(ticket)
+
+            comments = list(
+                map(model_to_dict, Comment.objects.filter(ticket=pk)))
+            for c in comments:
+                c['account'] = model_to_dict(
+                    Account.objects.get(pk=c['account']))['name']
+
+            return Response({
+                'title': ticket['title'],
+                'description': ticket['description'],
+                'status': ticket['status'],
+                'group': ticket['group'],
+                'comments': comments,
+            })
         except Ticket.DoesNotExist as ex:
             raise Http404 from ex
     elif request.method == 'PUT':
@@ -262,9 +300,8 @@ def handle_ticket(request, pk):
             if not request.user.groups.filter(name="Operator").exists():
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-            ticket = Ticket.objects.filter(pk=request.data["id"]).update(
-                status=request.data["status"])
-
+            ticket = Ticket.objects.get(pk=pk)
+            ticket.status = request.data["status"]
             ticket.save()
             return Response(status=status.HTTP_200_OK)
         except Client.DoesNotExist as ex:
