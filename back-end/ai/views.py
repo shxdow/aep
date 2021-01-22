@@ -4,7 +4,8 @@
 
 from django.contrib.auth import authenticate, login, logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
+from django.contrib import auth
 from django.forms.models import model_to_dict
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
@@ -71,7 +72,7 @@ def add_operator(request):
         user = User.objects.create_user(username=request.data["username"],
                                         password=request.data["password"])
 
-        group = Group(name="Operator")
+        group = auth.models.Group.objects.get_or_create(name="Operator")
         user.groups.add(group)
 
         user.save()
@@ -80,6 +81,7 @@ def add_operator(request):
         operator = Operator(account=acc, group=None)
         operator.save()
     except Exception as e:
+        print(e)
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(status=status.HTTP_201_CREATED)
 
