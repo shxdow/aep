@@ -3,7 +3,7 @@
 """
 
 from django.contrib.auth import authenticate, login, logout as auth_logout
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required  # user_passes_test
 from django.contrib.auth.models import User
 from django.contrib import auth
 from django.forms.models import model_to_dict
@@ -96,8 +96,7 @@ def add_operator(request):
         acc.save()
         operator = Operator(account=acc, group=None)
         operator.save()
-    except Exception as e:
-        print(e)
+    except:
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(status=status.HTTP_201_CREATED)
 
@@ -117,7 +116,7 @@ def add_client(request):
         acc.save()
         client = Client(account=acc)
         client.save()
-    except Exception as e:
+    except:
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(status=status.HTTP_201_CREATED)
 
@@ -134,7 +133,7 @@ def add_ticket(request):
                                        client=Client.objects.get(pk=request.data["client"]))
 
         ticket.save()
-    except Exception as e:
+    except:
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(status=status.HTTP_201_CREATED)
 
@@ -154,7 +153,7 @@ def add_comment(request):
                                          content=request.data["content"])
 
         comment.save()
-    except Exception as e:
+    except:
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return Response(status=status.HTTP_201_CREATED)
 
@@ -195,16 +194,16 @@ def handle_group(request, pk):
         try:
             Group.objects.filter(pk=pk).update(
                 description=request.data["description"])
-            return Response(status=status.HTTP_200_OK)
         except Group.DoesNotExist as ex:
             raise Http404 from ex
     elif request.method == 'DELETE':
         try:
             group = Group.objects.get(pk=pk)
             group.delete()
-            return Response(status=status.HTTP_200_OK)
         except Group.DoesNotExist as ex:
             raise Http404 from ex
+
+    return Response(status=status.HTTP_200_OK)
 
 
 @login_required
@@ -231,16 +230,16 @@ def handle_operator(request, pk):
             Operator.objects.filter(pk=pk).update(group=request.data["group"])
             Account.objects.filter(pk=request.data["account"]["id"]).update(
                 email=request.data["account"]["email"])
-            return Response(status=status.HTTP_200_OK)
         except Operator.DoesNotExist as ex:
             raise Http404 from ex
     elif request.method == 'DELETE':
         try:
             operator = Operator.objects.get(pk=pk)
             operator.delete()
-            return Response(status=status.HTTP_200_OK)
         except Operator.DoesNotExist as ex:
             raise Http404 from ex
+
+    return Response(status=status.HTTP_200_OK)
 
 
 @login_required
@@ -284,9 +283,9 @@ def handle_ticket(request, pk):
 
             comments = list(
                 map(model_to_dict, Comment.objects.filter(ticket=pk)))
-            for c in comments:
-                c['account'] = model_to_dict(
-                    Account.objects.get(pk=c['account']))['name']
+            for comment in comments:
+                comment['account'] = model_to_dict(
+                    Account.objects.get(pk=comment['account']))['name']
 
             return Response({
                 'title': ticket['title'],

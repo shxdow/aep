@@ -4,9 +4,10 @@
 
 from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User
+from django.contrib.sessions.middleware import SessionMiddleware
+
 from ai.models import Account, Client, Group, Operator
 from .views import add_operator, handle_operator, add_client, handle_client, add_group, handle_group, auth, logout
-from django.contrib.sessions.middleware import SessionMiddleware
 
 
 class AuthTestCase(TestCase):
@@ -25,7 +26,6 @@ class AuthTestCase(TestCase):
             'username': 'name',
             'password': 'sur',
         })
-        pass
 
         # setup
         #  self.middleware = SessionMiddleware()
@@ -40,13 +40,13 @@ class AuthTestCase(TestCase):
         #  request.user = self.user
         #  response = logout(request)
         #  self.assertEqual(response.status_code, 200)
-        pass
 
 
 class GroupTestCase(TestCase):
     """
         Test cases for groups
     """
+
     def setUp(self):
         self.factory = RequestFactory()
         self.user = User.objects.create_user(username='name', password='sur')
@@ -79,7 +79,7 @@ class GroupTestCase(TestCase):
         request = self.factory.put('/group/1/', {
             "description": "changed",
         },
-                                   content_type="application/json")
+            content_type="application/json")
         request.user = self.user
         response = handle_group(request, 1)
         self.assertEqual(response.status_code, 200)
@@ -135,6 +135,7 @@ class ClientTestCase(TestCase):
     """
         Test cases for clients
     """
+
     def setUp(self):
 
         self.factory = RequestFactory()
@@ -195,7 +196,7 @@ class ClientTestCase(TestCase):
                 'email': 'changed@ma.il'
             },
         },
-                                   content_type='application/json')
+            content_type='application/json')
         request.user = self.user
         response = handle_client(request, 1)
         self.assertEqual(response.status_code, 200)
@@ -233,6 +234,7 @@ class OperatorTestCase(TestCase):
     """
         Test cases for operators
     """
+
     def setUp(self):
         self.factory = RequestFactory()
         self.user = User.objects.create_user(username='em@ma.il',
@@ -293,7 +295,7 @@ class OperatorTestCase(TestCase):
             },
             "group": None
         },
-                                   content_type='application/json')
+            content_type='application/json')
 
         request.user = self.user
         response = handle_operator(request, 1)
