@@ -3,10 +3,8 @@
 """
 
 from django.test import TestCase, RequestFactory
-from django.contrib.auth.models import User
-from django.contrib.sessions.middleware import SessionMiddleware
-
-from ai.models import Account, Client, Group, Operator
+from django.contrib.auth.models import User, Group as DjangoGroup
+from .models import Account, Client, Group, Operator
 from .views import add_operator, handle_operator, add_client, handle_client, add_group, handle_group, auth, logout
 
 
@@ -49,7 +47,8 @@ class GroupTestCase(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = User.objects.create_user(username='name', password='sur')
+        self.user = User.objects.create_superuser(username='name',
+                                                  password='sur')
         self.group = Group.objects.create(description="desc")
         self.group.save()
 
@@ -92,7 +91,8 @@ class GroupTestCase(TestCase):
             '/group/add/', {
                 "wrong param":
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius",
-            })
+            },
+            content_type="application/json")
 
         request.user = self.user
         response = add_group(request)
@@ -106,7 +106,8 @@ class GroupTestCase(TestCase):
             '/group/add/', {
                 "description":
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius",
-            })
+            },
+            content_type="application/json")
 
         request.user = self.user
         response = add_group(request)
@@ -190,26 +191,24 @@ class ClientTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_put_client(self):
-        request = self.factory.put('/client/1/', {
-            "account": {
-                'id': 1,
-                'email': 'changed@ma.il'
-            },
-        },
-            content_type='application/json')
+        request = self.factory.put('/client/1/',
+                                   {
+                                       "account": {'id': 1, 'email': 'changed@ma.il'},
+                                   },
+                                   content_type='application/json')
         request.user = self.user
         response = handle_client(request, 1)
         self.assertEqual(response.status_code, 200)
 
     def test_add_client(self):
         """
-            Test the create of a client
+            Test the creation of a client
         """
 
         request = self.factory.post('/client/add/', {
             "username": "op",
             "password": "psw"
-        })
+        }, content_type="application/json")
 
         request.user = self.user
         response = add_client(request)
@@ -223,7 +222,7 @@ class ClientTestCase(TestCase):
         request = self.factory.post('/client/add', {
             "noparam": "op",
             "password": "psw"
-        })
+        }, content_type="application/json")
 
         request.user = self.user
         response = add_client(request)
@@ -237,8 +236,12 @@ class OperatorTestCase(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = User.objects.create_user(username='em@ma.il',
-                                             password='sur')
+        self.user = User.objects.create_superuser(username='us',
+                                                  email='em@al.it',
+                                                  password='sur')
+        self.user.save()
+        self.group = DjangoGroup.objects.get_or_create(name="Operator")[0]
+        self.user.groups.add(self.group)
         self.user.save()
         self.acc = Account(user=self.user, email='em@ma.il')
         self.acc.save()
@@ -251,7 +254,7 @@ class OperatorTestCase(TestCase):
         response = handle_operator(request, 1)
         self.assertEqual(response.status_code, 405)
 
-    def test_delete_opertor(self):
+    def test_delete_operator(self):
         """
             Tests the get endpoint for a particular operator
         """
@@ -260,7 +263,7 @@ class OperatorTestCase(TestCase):
         response = handle_operator(request, 1)
         self.assertEqual(response.status_code, 200)
 
-    def test_delete_fail_opertor(self):
+    def test_delete_fail_operator(self):
         """
             Tests the get endpoint for a particular operator
         """
@@ -269,7 +272,7 @@ class OperatorTestCase(TestCase):
         response = handle_operator(request, 12345)
         self.assertEqual(response.status_code, 404)
 
-    def test_get_opertor(self):
+    def test_get_operator(self):
         """
             Tests the get endpoint for a particular operator
         """
@@ -278,7 +281,7 @@ class OperatorTestCase(TestCase):
         response = handle_operator(request, 1)
         self.assertEqual(response.status_code, 200)
 
-    def test_get_fail_opertor(self):
+    def test_get_fail_operator(self):
         """
             Tests the get endpoint for a particular operator
         """
@@ -287,7 +290,7 @@ class OperatorTestCase(TestCase):
         response = handle_operator(request, 12345)
         self.assertEqual(response.status_code, 404)
 
-    def test_put_opertor(self):
+    def test_put_operator(self):
         request = self.factory.put('/operator/1/', {
             "account": {
                 'id': 1,
@@ -301,60 +304,31 @@ class OperatorTestCase(TestCase):
         response = handle_operator(request, 1)
         self.assertEqual(response.status_code, 200)
 
-    #  def test_put_fail_opertor(self):
-    #      request = self.factory.put('/operator/98765/', {
-    #          "account": {
-    #              'id': 98765,
-    #              'email': 'changed@ma.il'
-    #          },
-    #          "group": None
-    #      },
-    #                                 content_type='application/json')
-    #      request.user = self.user
-    #      response = handle_operator(request, 98765)
-    #      self.assertEqual(response.status_code, 404)
-
     def test_add_operator(self):
         """
-            Test the create of an operator
+            Test the creation of an operator
         """
 
         request = self.factory.post('/operator/add', {
             "username": "op",
             "password": "psw"
-        })
+        }, content_type="application/json")
 
         request.user = self.user
+        request.user.is_superuser = True
         response = add_operator(request)
         self.assertEqual(response.status_code, 201)
 
     def test_add_fail_operator(self):
         """
-            Test the create of an operator
+            Test the failure in the creation of an operator
         """
 
         request = self.factory.post('/operator/add', {
             "noparam": "op",
             "password": "psw"
-        })
+        }, content_type="application/json")
 
         request.user = self.user
         response = add_operator(request)
         self.assertEqual(response.status_code, 500)
-
-
-#  class GroupTestCase(TestCase):
-#      """
-#          Groups test cases
-#      """
-#      def setUp(self):
-#          Group.objects.create(description="Engineering")
-#          Group.objects.create(description="Sales lol")
-#          Group.objects.create(description="Marketing")
-#
-#      def test_group_exists(self):
-#          """
-#              Tests the group exist
-#          """
-#          eng_team = Group.objects.get(description="Engineering")
-#          self.assertEqual(eng_team.description, "Engineering")
