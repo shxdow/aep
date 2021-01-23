@@ -48,7 +48,7 @@ const TicketInfo = () => {
     } catch (ex) {
       setCommentError(ex.message);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   }, [ticketId, comment, loadTicketInfo, actions]);
 
