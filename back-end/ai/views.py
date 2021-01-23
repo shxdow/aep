@@ -36,7 +36,7 @@ def signup(request):
 
 
 @api_view(['POST'])
-def auth(request):
+def auth_login(request):
     """
         Allow login for users
     """

@@ -10,7 +10,7 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path('v1/', include(router.urls)),
-    path('v1/auth/', views.auth),
+    path('v1/auth/', views.auth_login),
     path('v1/signup/', views.signup),
     path('v1/operator/add/', views.add_operator),
     path('v1/operator/<int:pk>/', views.handle_operator),
