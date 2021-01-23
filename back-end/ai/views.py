@@ -25,6 +25,8 @@ def signup(request):
     """
 
     try:
+        body_unicode = request.body.decode('utf-8')
+        request.POST = json.loads(body_unicode)
         user = User.objects.create_user(username=request.POST["username"],
                                         password=request.POST["password"])
         user.save()
@@ -35,10 +37,14 @@ def signup(request):
     return HttpResponse(status=status.HTTP_201_CREATED)
 
 
+@csrf_exempt
 def auth(request):
     """
         Allow login for users
     """
+
+    body_unicode = request.body.decode('utf-8')
+    request.POST = json.loads(body_unicode)
 
     user = authenticate(username=request.POST["username"],
                         password=request.POST["password"])
@@ -83,6 +89,8 @@ def add_operator(request):
     try:
         if not request.user.is_superuser:
             return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
+        body_unicode = request.body.decode('utf-8')
+        request.POST = json.loads(body_unicode)
         user = User.objects.create_user(username=request.POST["username"],
                                         password=request.POST["password"])
 
@@ -105,6 +113,8 @@ def add_client(request):
     """
 
     try:
+        body_unicode = request.body.decode('utf-8')
+        request.POST = json.loads(body_unicode)
         user = User.objects.create_user(username=request.POST["username"],
                                         password=request.POST["password"])
 
@@ -125,6 +135,8 @@ def add_ticket(request):
         Let someone add a ticket
     """
     try:
+        body_unicode = request.body.decode('utf-8')
+        request.POST = json.loads(body_unicode)
         ticket = Ticket.objects.create(
             title=request.POST["title"],
             description=request.POST["description"],
@@ -143,6 +155,8 @@ def add_comment(request):
         Let someone leave a comment to a ticket
     """
     try:
+        body_unicode = request.body.decode('utf-8')
+        request.POST = json.loads(body_unicode)
         account = Account.objects.get(pk=request.POST["account"])
         ticket = Ticket.objects.get(pk=request.POST["ticket"])
         comment = Comment.objects.create(timestamp=request.POST["timestamp"],
@@ -164,6 +178,8 @@ def add_group(request):
     """
 
     try:
+        body_unicode = request.body.decode('utf-8')
+        request.POST = json.loads(body_unicode)
         group = Group.objects.create(description=request.POST["description"])
         group.save()
     except:
