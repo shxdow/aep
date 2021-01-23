@@ -10,7 +10,6 @@ import {
   TicketNew,
   TicketInfo,
 } from './index';
-import TicketInfoGraphics from './TicketInfoGraphics';
 
 import { Status } from './constants.tickets';
 
@@ -104,17 +103,3 @@ describe('Ticket creation page', () => {
     fireEvent.click(screen.getByText(/crea ticket/i), { preventDefault: () => { } });
   });
 });
-
-describe('Ticket info page', () => {
-  it('renders correctly', () => {
-    renderTicketInfoPage(1234, TicketInfo);
-    expect(screen.getByText(/informazioni ticket 1234/i)).toBeInTheDocument();
-  });
-
-  it('can submit comments', () => {
-    renderTicketInfoPage(1234, () => <TicketInfoGraphics ticketInfo={{ comments: [] }} />);
-    const comment = screen.getByPlaceholderText(/commenta qualcosa/i).closest('input');
-    fireEvent.change(comment, { target: { value: 'Commento' } });
-    fireEvent.click(screen.getByText(/^commenta$/i));
-  });
-})

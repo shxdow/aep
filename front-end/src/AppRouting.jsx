@@ -6,7 +6,8 @@ import Home from './scenes/home';
 import Login from './scenes/login';
 import NotFound from './scenes/NotFound';
 import Signup from './scenes/signup';
-import { TicketInfo, TicketList, TicketNew } from './scenes/tickets';
+import TicketInfo from './scenes/ticket-info';
+import { TicketList, TicketNew } from './scenes/tickets';
 
 const AppRouting = ({ withAuth }) => (
   <Switch>
