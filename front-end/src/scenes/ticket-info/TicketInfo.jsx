@@ -1,16 +1,17 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { ProgressBar } from 'react-bootstrap';
 
 import Card from '../../components/card';
 import Page from '../../components/page';
 
-import actions from './actions.tickets';
+import TicketInfoActionsContext from './TicketInfoActionsContext';
 
 import TicketGraphics from './TicketInfoGraphics';
 import './tickets.css';
 
 const TicketInfo = () => {
+  const actions = useContext(TicketInfoActionsContext);
   const [ticketInfo, setTicketInfo] = useState(null);
   const [comment, setComment] = useState('');
 
@@ -22,40 +23,48 @@ const TicketInfo = () => {
 
   const { ticketId } = useParams();
 
-  const loadTicketInfo = useCallback(() => {
+  const loadTicketInfo = useCallback(async () => {
     setLoading(true);
-    actions.getTicketInfo(ticketId)
-      .then(setTicketInfo)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, [ticketId]);
+    try {
+      const data = await actions.getTicketInfo(ticketId);
+      setTicketInfo(data);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [ticketId, actions]);
 
-  const submitComment = useCallback((e) => {
+  const submitComment = useCallback(async (e) => {
     e.preventDefault();
 
     if (!comment) return;
 
     setSubmitting(true);
-    actions.createComment(ticketId, comment)
-      .then(() => {
-        setComment('');
-        loadTicketInfo();
-      })
-      .catch((ex) => setCommentError(ex.message))
-      .finally(() => setSubmitting(false));
-  }, [ticketId, comment, loadTicketInfo]);
+    try {
+      await actions.createComment(ticketId, comment);
+      setComment('');
+      loadTicketInfo();
+    } catch (ex) {
+      setCommentError(ex.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [ticketId, comment, loadTicketInfo, actions]);
 
   const updateComment = useCallback((e) => {
     setComment(e.target.value);
   }, []);
 
-  const updateStatus = useCallback(({ value }) => {
+  const updateStatus = useCallback(async ({ value }) => {
     const previousStatus = ticketInfo?.status;
     setTicketInfo((prev) => ({ ...prev, status: value }));
-    actions
-      .changeTicketStatus(ticketId, value)
-      .catch(() => setTicketInfo((prev) => ({ ...prev, status: previousStatus })));
-  }, [ticketId, ticketInfo?.status]);
+    try {
+      await actions.changeTicketStatus(ticketId, value);
+    } catch (e) {
+      setTicketInfo((prev) => ({ ...prev, status: previousStatus }));
+    }
+  }, [ticketId, ticketInfo?.status, actions]);
 
   useEffect(() => {
     if (!ticketId) return;

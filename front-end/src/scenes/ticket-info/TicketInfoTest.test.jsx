@@ -5,9 +5,10 @@ import { Router, Route } from 'react-router-dom';
 
 import '@testing-library/jest-dom/extend-expect';
 
-import TicketInfo from './index';
+import TicketInfo from './TicketInfo';
 import TicketInfoGraphics from './TicketInfoGraphics';
 import TicketComment from './TicketInfoComment';
+import TicketInfoActionsContext from './TicketInfoActionsContext';
 
 import { Status } from './constants.tickets';
 
@@ -18,21 +19,19 @@ const waitForPainting = async (wrapper) => {
   });
 };
 
-const renderWithRouter = (content, route = null) => {
-  const history = createMemoryHistory();
-  if (route) history.push(route)
-  const wrapper = render(<Router history={history}>{content}</Router>);
-  waitForPainting(wrapper);
-  return { wrapper, history };
-};
-
 const renderTicketInfoPage = (id, component) => {
   const history = createMemoryHistory();
   history.push(`/tickets/${id}`);
   const wrapper = render(
-    <Router history={history}>
-      <Route exact path="/tickets/:ticketId" component={component} />
-    </Router>
+    <TicketInfoActionsContext.Provider value={{
+      getTicketInfo: () => ({ id: 1, title: 'Titolo', description: '', comments: [] }),
+      createComment: () => null,
+      changeTicketStatus: () => null,
+    }}>
+      <Router history={history}>
+        <Route exact path="/tickets/:ticketId" component={component} />
+      </Router>
+    </TicketInfoActionsContext.Provider>
   );
   waitForPainting(wrapper);
   return { wrapper, history };
