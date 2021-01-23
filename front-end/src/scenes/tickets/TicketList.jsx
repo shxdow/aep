@@ -15,6 +15,7 @@ const TicketList = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
+  const [canCreate, setCanCreate] = useState(false);
   const history = useHistory();
 
   useEffect(() => {
@@ -22,6 +23,10 @@ const TicketList = () => {
       .then(setTickets)
       .catch(() => { })
       .finally(() => setLoading(false));
+
+    if (sessionStorage.getItem('client')) {
+      setCanCreate(true);
+    }
   }, []);
 
   const createTicket = useCallback(() => {
@@ -44,7 +49,7 @@ const TicketList = () => {
         title="Qui puoi vedere i tuoi ticket"
         search={search}
         onSearchChange={setSearch}
-        onCreate={createTicket}
+        onCreate={canCreate ? createTicket : null}
         onEdit={viewTicket}
         buttonsEnabled={!!selected}
       >
