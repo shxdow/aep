@@ -3,7 +3,7 @@
 """
 
 from django.test import TestCase, RequestFactory
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group as DjangoGroup
 from ai.models import Account, Client, Group, Operator
 from .views import add_operator, handle_operator, add_client, handle_client, add_group, handle_group, auth, logout
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -49,7 +49,8 @@ class GroupTestCase(TestCase):
     """
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = User.objects.create_user(username='name', password='sur')
+        self.user = User.objects.create_superuser(username='name',
+                                                  password='sur')
         self.group = Group.objects.create(description="desc")
         self.group.save()
 
@@ -202,7 +203,7 @@ class ClientTestCase(TestCase):
 
     def test_add_client(self):
         """
-            Test the create of a client
+            Test the creation of a client
         """
 
         request = self.factory.post('/client/add/', {
@@ -235,8 +236,12 @@ class OperatorTestCase(TestCase):
     """
     def setUp(self):
         self.factory = RequestFactory()
-        self.user = User.objects.create_user(username='em@ma.il',
-                                             password='sur')
+        self.user = User.objects.create_superuser(username='us',
+                                                  email='em@al.it',
+                                                  password='sur')
+        self.user.save()
+        self.group = DjangoGroup.objects.get_or_create(name="Operator")[0]
+        self.user.groups.add(self.group)
         self.user.save()
         self.acc = Account(user=self.user, email='em@ma.il')
         self.acc.save()
@@ -314,7 +319,7 @@ class OperatorTestCase(TestCase):
 
     def test_add_operator(self):
         """
-            Test the create of an operator
+            Test the creation of an operator
         """
 
         request = self.factory.post('/operator/add', {
@@ -323,12 +328,13 @@ class OperatorTestCase(TestCase):
         })
 
         request.user = self.user
+        request.user.is_superuser = True
         response = add_operator(request)
         self.assertEqual(response.status_code, 201)
 
     def test_add_fail_operator(self):
         """
-            Test the create of an operator
+            Test the failure in the creation of an operator
         """
 
         request = self.factory.post('/operator/add', {
@@ -339,20 +345,3 @@ class OperatorTestCase(TestCase):
         request.user = self.user
         response = add_operator(request)
         self.assertEqual(response.status_code, 500)
-
-
-#  class GroupTestCase(TestCase):
-#      """
-#          Groups test cases
-#      """
-#      def setUp(self):
-#          Group.objects.create(description="Engineering")
-#          Group.objects.create(description="Sales lol")
-#          Group.objects.create(description="Marketing")
-#
-#      def test_group_exists(self):
-#          """
-#              Tests the group exist
-#          """
-#          eng_team = Group.objects.get(description="Engineering")
-#          self.assertEqual(eng_team.description, "Engineering")
