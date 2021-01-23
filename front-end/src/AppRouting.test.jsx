@@ -1,5 +1,4 @@
 import React from 'react';
-import Cookies from 'js-cookie';
 import { render, screen, act } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router-dom';

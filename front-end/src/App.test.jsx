@@ -1,5 +1,4 @@
 import React from 'react';
-import Cookies from 'js-cookie';
 import { render, screen } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
@@ -17,7 +16,7 @@ describe('App', () => {
 });
 
 const renderWithRoute = (route) => {
-  Cookies.set('token', 'test_token');
+  sessionStorage.setItem('loggedIn', true);
   const history = createMemoryHistory();
   history.push(route);
   return render(

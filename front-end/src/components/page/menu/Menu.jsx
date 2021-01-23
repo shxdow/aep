@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import Cookies from 'js-cookie';
 import { Link } from 'react-router-dom';
 
 import CollapsableSection from './MenuCollapsableSection';
@@ -22,7 +21,7 @@ const Menu = () => {
   }), [updateSection, sectionOpen]);
 
   useEffect(() => {
-    setIsClient(!!Cookies.get('client'));
+    setIsClient(!!sessionStorage.getItem('client'));
   }, []);
 
   return (

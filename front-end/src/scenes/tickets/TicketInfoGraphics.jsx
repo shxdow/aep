@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import Cookies from 'js-cookie';
 import Select from 'react-select';
 import { useParams } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
@@ -38,7 +37,7 @@ const TicketInfoGraphics = ({
   );
 
   useEffect(() => {
-    setIsClient(!!Cookies.get('client'));
+    setIsClient(!!sessionStorage.getItem('client'));
   }, []);
 
   return (

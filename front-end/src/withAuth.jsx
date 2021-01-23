@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
 import { useHistory } from 'react-router-dom';
 
 import FakeLoadingPage from './components/page/FakeLoadingPage';
@@ -12,7 +11,7 @@ const withAuth = (WrappedComponent) => (props) => {
   useEffect(() => {
     try {
       setLoading(true);
-      if (Cookies.get('token')) {
+      if (sessionStorage.getItem('loggedIn')) {
         setIsAuthorized(true);
         setLoading(false);
       } else {

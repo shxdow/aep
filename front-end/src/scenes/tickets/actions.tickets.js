@@ -1,6 +1,5 @@
 import axios from 'axios';
 import moment from 'moment';
-import Cookies from 'js-cookie';
 
 const getTickets = async () => {
   const { data } = await axios.get(`${global.SERVER_ADDRESS}/v1/tickets`);
@@ -22,14 +21,14 @@ const changeTicketStatus = async (id, status) => {
 const createTicket = async (title, description) => {
   await axios.post(
     `${global.SERVER_ADDRESS}/v1/ticket/add/`,
-    { title, description, client: Cookies.get('client') },
+    { title, description, client: sessionStorage.getItem('client') },
   );
 };
 
 const createComment = async (ticket, content) => {
   await axios.post(`${global.SERVER_ADDRESS}/v1/comment/add/`,
     {
-      account: Cookies.get('account'),
+      account: sessionStorage.getItem('account'),
       ticket,
       content,
       timestamp: moment().format(),
