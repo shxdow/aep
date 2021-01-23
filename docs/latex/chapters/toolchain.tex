@@ -1,0 +1,107 @@
+Questo capitolo comprende tutte le scelte di librerie, framework e piattaforme che sono state effettuate
+per l'implementazione del progetto.
+
+\section{Modellazione}
+
+Per la modellazione sono stati usati i seguenti tool:
+
+\begin{itemize}
+  \item \textbf{Diagrammi UML di componenti, classi, architettura e deployment}: \textit{Draw.io}, uno
+        strumento sia online sia offline open source per la realizzazione di diagrammi generici, che comprende
+        anche strumenti appositi per la modellazione UML;
+  \item \textbf{Diagramma dell'implementazione delle classi}: \textit{pyreverse}, un tool in Python in grado di
+        estrarre diagrammi rappresentanti le relazioni tra delle classi pre-esistenti in un progetto.
+\end{itemize}
+
+\section{Linguaggi e librerie}
+
+\subsection{Back-end}
+
+Per l'implementazione del back-end sono stati usati:
+
+\begin{itemize}
+  \item \textbf{Python} come linguaggio di programmazione, scelto per la sua semplicità e portabilità;
+  \item \textbf{PIP} come package manager per Python;
+  \item \textbf{Django}, un framework Python per la realizzazione di server, gestione di database e templating;
+  \item \textbf{Django REST framework}, un framework Python per costruire web API in Django;
+  \item \textbf{SQLite3} come \textit{DBMS}, un dialetto SQL che offre un'ottima integrazione con Python; pur non
+        essendo il più performante, è stato scelto per rapidità di implementazione, e in iterazioni future è possibile
+        scambiarlo con altri DBMS più performanti;
+  \item \textbf{Pylint} per l'\textit{analisi statica} del codice Python, l'identificazione real-time di errori, warning
+        e la fornitura di ottimizzazioni e suggerimenti;
+  \item \textbf{Django Test Framework} e \textbf{Coverage.py} per l'\textit{analisi dinamica} del codice Python, dei quali
+        il primo è integrato in Django, mentre il secondo è uno strumento esterno per misurare la copertura del codice che fornisce
+        anche un output interattivo in HTML.
+\end{itemize}
+
+\subsection{Front-end}
+
+Per l'implementazione del front-end sono stati usati:
+
+\begin{itemize}
+  \item \textbf{JavaScript} come linguaggio di programmazione;
+  \item \textbf{HTML e CSS} come linguaggi di markup e styling delle pagine web;
+  \item Il framework \textbf{Bootstrap}, che comprende svariati stili di default per velocizzare lo sviluppo di
+        una UI coerente e reattiva;
+  \item \textbf{React.js} come libreria per la gestione di componenti riusabili ed ottimizzati grazie all'implementazione di
+        un \textit{virtual DOM} per il dispatching intelligente di aggiornamenti grafici della pagina web e che offre anche
+        la gestione dello stato e dei dati usati dalla Single Page Application;
+  \item \textbf{Axios} come libreria JavaScript per effettuare delle richieste AJAX al back-end;
+  \item \textbf{Moment}, libreria JavaScript per la gestione di istanti di tempo, giorni, mesi ed intervalli di tempo;
+  \item \textbf{Ag-grid} per le tabelle e le griglie, con ottimizzazioni quali la virtualizzazione di righe e colonne,
+        la selezione di righe e la ricerca rapida;
+  \item \textbf{Lodash}, una libreria JavaScript che fornisce un set di funzioni di utilità base comunemente usate;
+  \item \textbf{Jest}, un framework per il \textit{testing} e l'\textit{analisi dinamica} del codice, soprattutto con la libreria React;
+  \item \textbf{Testing Library}, una libreria che fornisce alcune utilità per il testing;
+  \item \textbf{ESLint}, una libreria per l'\textit{analisi statica} del codice, che fornisce anche suggerimenti, rafforza
+        degli standard stilistici e corregge eventuali violazioni di regole custom;
+  \item \textbf{Node.js} come JavaScript runtime environment per la compilazione della Single Page Application;
+  \item \textbf{NPM} e \textbf{Yarn} come package manager per l'ambiente Node, usati per l'installazione delle varie dipdendenze.
+\end{itemize}
+
+\section{Documentazione}
+
+La documentazione è stata scritta in \LaTeX, compilata tramite il tool \texttt{latexmk}.
+
+\section{Versioning}
+
+Il sistema di versioning utilizzato è \textbf{Git}, un sistema di versioning distribuito, open source e
+gratuito.
+
+Il codice del progetto è presente anche su \textbf{GitHub}, un sito per remote hosting di progetti git.
+
+\section{Ambienti e IDEs}
+
+Lo strumento principale utilizzato è \textbf{Visual Studio Code}, un editor di testo open source e gratuito
+realizzato per i sistemi operativi \textit{Linux}, \textit{macOS} e \textit{Windows}.
+
+Esso non è un IDE, in quanto non offre funzionalità di build automation e debugging, ma si basa invece
+su un sistema di \textit{estensioni}, sia per syntax highlighting, linting, testing e building, mentre tutti
+gli strumenti per il funzionamento dei linguaggi sono locali e forniti dal sistema operativo.
+
+Fra le molte funzionalità, è presente anche la \textit{condivisione live del codice}, in modo da poter
+discuterne in real-time e poter usare tecniche di sviluppo agili che richiedono più persone, come il
+\textit{pair programming}, anche a distanza.
+
+Come esempio, nella figura \ref{fig:vscode-showcase} è visibile l'editor Visual Studio Code,
+che permette anche di gestire diversi progetti, scritti in diversi linguaggi e con diverse tecnologie,
+senza dover cambiare editor o IDE.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{toolchain/vscode-showcase.jpg}
+  \caption{Un esempio dell'uso di Visual Studio Code}
+  \label{fig:vscode-showcase}
+\end{figure}
+
+È anche stato usato \textbf{VIM}, un editor di testo scritto originariamente per Unix per poter essere
+usato da riga di comando, in quei casi in cui era necessario modificare rapidamente un file senza aprire
+necessariamente un editor complesso come Visual Studio Code.
+Un esempio è visibile in figura \ref{fig:vim-showcase}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{toolchain/vim-showcase.jpg}
+  \caption{Esempio di uso di VIM}
+  \label{fig:vim-showcase}
+\end{figure}
