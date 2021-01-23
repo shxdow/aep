@@ -15,7 +15,7 @@ const TicketList = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
-  const [canCreate, setCanCreate] = useState(false);
+  const [canCreate, setCanCreate] = useState(true);
   const history = useHistory();
 
   useEffect(() => {
@@ -24,8 +24,8 @@ const TicketList = () => {
       .catch(() => { })
       .finally(() => setLoading(false));
 
-    if (sessionStorage.getItem('client')) {
-      setCanCreate(true);
+    if (!sessionStorage.getItem('client')) {
+      setCanCreate(false);
     }
   }, []);
 

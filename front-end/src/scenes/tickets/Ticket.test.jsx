@@ -8,7 +8,6 @@ import '@testing-library/jest-dom/extend-expect';
 import {
   TicketList,
   TicketNew,
-  TicketInfo,
 } from './index';
 
 import { Status } from './constants.tickets';
@@ -27,18 +26,6 @@ const renderWithRouter = (content, route = null) => {
   waitForPainting(wrapper);
   return { wrapper, history };
 };
-
-const renderTicketInfoPage = (id, component) => {
-  const history = createMemoryHistory();
-  history.push(`/tickets/${id}`);
-  const wrapper = render(
-    <Router history={history}>
-      <Route exact path="/tickets/:ticketId" component={component} />
-    </Router>
-  );
-  waitForPainting(wrapper);
-  return { wrapper, history };
-}
 
 describe('Ticket list', () => {
   it('renders correctly', () => {
