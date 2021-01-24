@@ -119,12 +119,8 @@ di aver trovato una vera appartenenza.
     \State $words \gets $ \Call{ExtractWords}{$ticket$}
     \State $G \gets \emptyset$ \Comment{Copia della lista dei gruppi}
     \State
-    \ForAll{$g \in groups$}
-      \State \Call{Push}{$G$, $g$}
-    \EndFor
-    \State
     \ForAll{$word \in words$}
-      \ForAll{$(id, scores) \in G$}
+      \ForAll{$(id, scores) \in groups$}
         \If{$word \in scores$}
           \State $w \gets $ \Call{Get}{$scores$, $word$}
         \Else
@@ -133,14 +129,14 @@ di aver trovato una vera appartenenza.
 
         \State \Call{Increment}{$P$, $id$, $w$}
         \State $k \gets $ \Call{WeightUpdate}{$w$}
-        \State \Call{Increment}{$scores$, $w$, $k$}
+        \State \Call{Increment}{$scores$, $word$, $k$}
       \EndFor
     \EndFor
     \State
     \State $id \gets $ \Call{MaxInDict}{$P$}
     \State $v \gets $ \Call{Get}{$P$, $id$}
     \If{$v > S$}
-      \State \Return ($id$, $G$)
+      \State \Return ($id$, $groups$)
     \Else
       \State \Return \textbf{null}
     \EndIf
