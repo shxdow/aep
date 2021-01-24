@@ -29,7 +29,7 @@ con l'introduzione di strutture dati aggiuntive sui gruppi che racchiudano una s
 appartenenti al gruppo stesso.
 Queste strutture dati sono poi aggiornate ad ogni assegnamento di un nuovo ticket.
 
-Tale struttura è semplicemente una \textit{hashmap}, che usa delle parole come chiavi e dei numeri reali come valori.
+Tale struttura è semplicemente un \textit{dizionario} che usa delle parole come chiavi e dei numeri reali come valori.
 Le parole non sono tutte quelle della lingua italiana, ma devono soddisfare almeno una delle seguenti:
 \begin{enumerate}
   \item essere lunghe almeno $5$ caratteri;
@@ -59,7 +59,43 @@ vengano presi in considerazione.
 
 \section{Flowchart}
 
-% TODO: Fare il flowchart
+Nell'immagine \ref{fig:flowchart-assegnamento-ticket} è visibile il flowchart che descrive la logica
+del nostro algoritmo principale, ovvero quello dell'assegnamento di un ticket ad un gruppo.
+Sono anche presenti dei riferimenti ad altri flowchart (i rettangoli con i doppi bordi), che sono definiti successivamente.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{iterazione3/flowchart-assegnamento-ticket.png}
+  \caption{Flowchart di assegnamento di un ticket ad un gruppo}
+  \label{fig:flowchart-assegnamento-ticket}
+\end{figure}
+
+Il flowchart \ref{fig:flowchart-aggiornamento-peso} rappresenta la logica di aggiornamento dei pesi:
+\begin{itemize}
+  \item il peso viene aumentato sostanzialmente se il suo valore è alto;
+  \item il peso viene aumentato di poco se il suo valore è basso;
+  \item il peso viene diminuito se è negativo.
+\end{itemize}
+
+Questo dà la possibilità di penalizzare alcune parole e dare più importanza ad altre nella ricerca
+di un gruppo adatto al ticket in esame.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\linewidth]{iterazione3/flowchart-aggiornamento-peso.png}
+  \caption{Flowchart per l'aggiornamento del peso di una parola in un gruppo}
+  \label{fig:flowchart-aggiornamento-peso}
+\end{figure}
+
+Infine, in figura \ref{fig:flowchart-massimo-in-dizionario} è presente l'algoritmo per la ricerca del massimo
+in un dizionario.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\linewidth]{iterazione3/flowchart-massimo-in-dizionario.png}
+  \caption{Flowchart per la ricerca della chiave con il valore massimo in un dizionario}
+  \label{fig:flowchart-massimo-in-dizionario}
+\end{figure}
 
 \section{Pseudocodice}
 
@@ -68,8 +104,8 @@ In esso è possibile vedere alcune funzioni particolari:
 \begin{itemize}
   \item \texttt{ExtractWords}, usata per ottenere l'elenco delle parole dal titolo e dalla descrizione del ticket, rimuovendo la punteggiatura;
   \item \texttt{Push}, che aggiunge un elemento ad una lista;
-  \item \texttt{Get} per ottenere il valore di una chiave da una hashmap;
-  \item \texttt{Increment}, che aumenta un valore in una hashmap secondo una chiave, o lo inserisce se non esiste.
+  \item \texttt{Get} per ottenere il valore di una chiave da un dizionario;
+  \item \texttt{Increment}, che aumenta un valore in un dizionario secondo una chiave, o lo inserisce se non esiste.
 \end{itemize}
 
 Nel codice è presente anche una soglia \texttt{S}, che rappresenta il valore minimo per cui si può considerare
@@ -79,7 +115,7 @@ di aver trovato una vera appartenenza.
   \caption{Assegnamento di un ticket ad un gruppo}\label{alg:ticket-assign}
   \begin{algorithmic}[1]
   \Function{AssignGroupToTicket}{$ticket$, $groups$, $S$}
-    \State $P \gets \emptyset$ \Comment{HashMap vuota}
+    \State $P \gets \emptyset$ \Comment{Dizionario vuoto}
     \State $words \gets $ \Call{ExtractWords}{$ticket$}
     \State $G \gets \emptyset$ \Comment{Copia della lista dei gruppi}
     \State
@@ -97,11 +133,11 @@ di aver trovato una vera appartenenza.
 
         \State \Call{Increment}{$P$, $id$, $w$}
         \State $k \gets $ \Call{WeightUpdate}{$w$}
-        \State \Call{Set}{$scores$, $w$, $w + k$}
+        \State \Call{Increment}{$scores$, $w$, $k$}
       \EndFor
     \EndFor
     \State
-    \State $id \gets $ \Call{MaxInHash}{$P$}
+    \State $id \gets $ \Call{MaxInDict}{$P$}
     \State $v \gets $ \Call{Get}{$P$, $id$}
     \If{$v > S$}
       \State \Return ($id$, $G$)
@@ -119,6 +155,9 @@ L'algoritmo \ref{alg:weight-update} rappresenta invece come vengono aggiornati i
   \item se il peso è invece negativo, allora si vuole penalizzare ancora di più.
 \end{enumerate}
 
+In questo algoritmo, $K_1$ rappresenta un numero positivo maggiore di $1$, $K_2$ è un valore positivo compreso
+tra $0$ e $1$ e $K_3$ è un numero negativo. Questi numeri saranno tarati su base di prove sperimentali
+
 All'inizio i pesi possono essere tutti nulli, oppure l'azienda ha la possibilità di impostarne alcuni manualmente.
 Ad esempio, per un ipotetico gruppo di operatori che si occupano di un'applicazione mobile, si potrebbe assegnare un peso
 alto alla parola ``mobile'' oppure ``app''.
@@ -128,24 +167,24 @@ alto alla parola ``mobile'' oppure ``app''.
   \begin{algorithmic}[1]
     \Function{WeightUpdate}{$x$}
       \If{$x > 1$}
-        \State \Return $0.5$
+        \State \Return $K_1$
       \ElsIf{$x \ge 0$}
-        \State \Return $0.1$
+        \State \Return $K_2$
       \Else
-        \State \Return $-0.5$
+        \State \Return $K_3$
       \EndIf
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
 
-L'algoritmo \ref{alg:max-in-hash} è invece la ricerca della chiave con il valore massimo in una hashmap.
-Abbiamo supposto che sia possibile accedere all'elenco delle chiavi di una hashmap per
+L'algoritmo \ref{alg:max-in-dict} è invece la ricerca della chiave con il valore massimo in un dizionario.
+Abbiamo supposto che sia possibile accedere all'elenco delle chiavi di un dizionario per
 poterle analizzare una ad una.
 
 \begin{algorithm}
-  \caption{Ottenimento della chiave con il valore massimo in una HashMap}\label{alg:max-in-hash}
+  \caption{Ottenimento della chiave con il valore massimo in un dizionario}\label{alg:max-in-dict}
   \begin{algorithmic}[1]
-    \Function{MaxInHash}{$h$}
+    \Function{MaxInDict}{$h$}
       \State $v_{max} \gets $ \textbf{null}
       \State $k_{max} \gets $ \textbf{null}
       \ForAll{$k \in h$}
