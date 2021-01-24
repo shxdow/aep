@@ -1,5 +1,4 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
 
 const login = async (username, password) => {
   const { data } = await axios.post(`${global.SERVER_ADDRESS}/v1/auth/`, {
@@ -7,7 +6,14 @@ const login = async (username, password) => {
     password,
   });
 
-  Cookies.set('token', data.token);
+  sessionStorage.setItem('loggedIn', true);
+  sessionStorage.setItem('username', username);
+  if (data.account) {
+    sessionStorage.setItem('account', data.account);
+  }
+  if (data.client) {
+    sessionStorage.setItem('client', data.client);
+  }
 };
 
 export default { login };

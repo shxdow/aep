@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router-dom';
 
@@ -30,5 +30,12 @@ describe('TopBar', () => {
     sessionStorage.setItem('username', 'Quick brown fox');
     renderWithRouter(<TopBar title="Test" />);
     expect(screen.getByText(/quick brown fox/i)).toBeInTheDocument();
+  });
+
+  it('has a logout button', () => {
+    renderWithRouter(<TopBar title="Test" />);
+    act(() => {
+      fireEvent.click(screen.getByTitle(/logout/i));
+    });
   });
 });

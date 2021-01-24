@@ -1,0 +1,195 @@
+\section{Introduzione}
+
+In questa iterazione vengono implementate le funzionalità base per la gestione dei ticket,
+il core della nostra applicazione.
+
+In particolare, le funzionalità implementate sono le seguenti:
+\begin{itemize}
+  \item \texttt{FT1}, la creazione di ticket tramite form;
+  \item \texttt{FT3}, il controllo dello stato del ticket, ma solamente per utenti loggati;
+  \item \texttt{FT4}, l'inserimento di commenti sul ticket da parte di utenti loggati ed operatori;
+  \item \texttt{FT5}, la gestione dello stato del ticket da parte di operatori.
+\end{itemize}
+
+È quindi garantita una comunicazione tra operatori e clienti, funzionalità di base per una
+buona \textit{User Experience} in questo ambito.
+
+\section{Back-end}
+
+\subsection{Rimozione di Django REST Framework}
+
+In questa iterazione abbiamo deciso di rimuovere \textit{Django REST Framework} per motivi sia di
+prestazioni sia di complessità nella gestione dell'autenticazione.
+
+Infatti, il framework dà dei problemi con l'autenticazione fornita da \textit{Django}, in quanto
+può non effettuare il parsing corretto dei cookies di autenticazione in presenza di richieste
+di tipo \texttt{OPTIONS} fatte dai browser.
+Questo tipo di problema ci portava ad avere un'autenticazione funzionante ma, ad una successiva chiamata
+che avesse il tipo \texttt{OPTIONS}, il framework rispondeva con \texttt{302} ed effettuava il re-indirizzamento
+all'endpoint con il metodo corretto, senza però instradare anche i cookies.
+
+Ciò risultava in un login funzionante, ma ogni altra richiesta era come se venisse fatta da un utente anonimo.
+
+\subsection{API endpoints}
+
+Nel back-end sono stati realizzati gli endpoint visibili in tabella \ref{tab:endpoint-tickets}.
+
+Questi endpoint sono le fondamenta per il funzionamento base della comunicazione tra operatore e cliente:
+\begin{enumerate}
+  \item l'utente crea un nuovo ticket tramite l'endpoint \texttt{/v1/ticket/add/};
+  \item l'utente visualizza i propri ticket con \texttt{/v1/tickets};
+  \item volendo, sia gli utenti sia gli operatori possono visualizzare un ticket con \texttt{/v1/ticket/<pk>}
+        ed aggiungere commenti con \texttt{/v1/comment/add/}.
+\end{enumerate}
+
+\begin{table}
+  \centering
+  \begin{tabular}{|l|l|}
+    \hline Endpoint & Descrizione \\
+    \hline
+    \hline \texttt{GET /v1/tickets} & Ritorna l'elenco dei ticket \\
+    \hline \texttt{POST /v1/ticket/add/} & Crea un nuovo ticket \\
+    \hline \texttt{GET /v1/ticket/<pk>/} & Ottiene le informazioni di un ticket \\
+    \hline \texttt{PUT /v1/ticket/<pk>/} & Aggiorna lo stato di un ticket \\
+    \hline \texttt{POST /v1/comment/add/} & Crea un nuovo commento su un ticket \\
+    \hline
+  \end{tabular}
+  \caption{Endpoint}
+  \label{tab:endpoint-tickets}
+\end{table}
+
+Di seguito un estratto di codice che rappresenta le varie funzioni per la creazione di ticket
+e di commenti.
+
+\begin{lstlisting}[language=Python]
+@login_required
+@renderer_classes(JSONRenderer)
+def add_ticket(request):
+  try:
+      request.POST = decode_json_body(request)
+      ticket = Ticket.objects.create(
+        title=request.POST["title"],
+        description=request.POST["description"],
+        client=Client.objects.get(pk=request.POST["client"]))
+
+      ticket.save()
+  except:
+      return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+  return HttpResponse(status=status.HTTP_201_CREATED)
+
+
+@login_required
+@renderer_classes(JSONRenderer)
+def add_comment(request):
+    try:
+        request.POST = decode_json_body(request)
+        account = Account.objects.get(pk=request.POST["account"])
+        ticket = Ticket.objects.get(pk=request.POST["ticket"])
+        comment = Comment.objects.create(
+          timestamp=request.POST["timestamp"],
+          ticket=ticket,
+          account=account,
+          content=request.POST["content"])
+
+        comment.save()
+    except:
+        return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return HttpResponse(status=status.HTTP_201_CREATED)
+\end{lstlisting}
+
+\subsection{Testing ed analisi statica}
+
+Alla fine di questa iterazione la qualità del codice è di $9.28$ su $10$ secondo \textit{pylint}.
+
+La coverage invece è visibile nella relativa cartella ed ammonta all'$85 \%$, con $30$ test positivi.
+
+\section{Front-end}
+
+\subsection{Pagine aggiunte}
+
+Il front-end rispecchia le nuove API aggiunte. In particolare, sono state realizzate le seguenti pagine:
+
+\begin{itemize}
+  \item lista dei ticket;
+  \item creazione di un ticket, solo per gli utenti loggati;
+  \item visualizzazione delle informazioni di un ticket, per operatori ed utenti loggati.
+\end{itemize}
+
+Queste tre pagine racchiudono l'intera UX e UI che permettono ad un utente di sapere quali ticket ha aperto,
+in che stato si trovano e come gli operatori stanno gestendo il problema.
+
+Nella figura \ref{fig:front-end-ticket-fsm} sono visibili queste tre pagine e l'utente può navigare da una all'altra.
+È da ricordare che, su browser, in qualunque momento è possibile ritornare alla pagina precedente grazie
+alla navigazione integrata.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\linewidth]{iterazione2/front-end-ticket-fsm.png}
+  \caption{Relazioni tra le pagine dei ticket}
+  \label{fig:front-end-ticket-fsm}
+\end{figure}
+
+Di seguito sono presenti varie immagini che rappresentano le pagine implementate su front-end.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{iterazione2/ticket-list-page.jpg}
+  \caption{Pagina di elenco ticket}
+  \label{fig:ticket-list-page}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{iterazione2/ticket-new-page.jpg}
+  \caption{Pagina di creazione ticket}
+  \label{fig:ticket-new-page}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{iterazione2/ticket-info-page.jpg}
+  \caption{Le informazioni del ticket}
+  \label{fig:ticket-info-page}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{iterazione2/ticket-change-status-page.jpg}
+  \caption{Un operatore cambia lo stato del ticket}
+  \label{fig:ticket-change-status}
+\end{figure}
+
+\subsection{Testing, coverage ed analisi statica}
+
+Alla fine di questa iterazione, \textit{ESLint} non ha trovato alcun problema nel codice.
+
+Come visibile in figura \ref{fig:front-end-tests-it2}, i test del front-end consistono in questo istante
+dello sviluppo:
+\begin{enumerate}
+  \item $10$ suite di test;
+  \item $52$ casi di test.
+\end{enumerate}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{iterazione2/front-end-tests-it2.jpg}
+  \caption{Unit testing front-end}
+  \label{fig:front-end-tests-it2}
+\end{figure}
+
+La coverage ammonta ai risultati visibili nella tabella \ref{tab:code-coverage-front-end-it2}.
+
+\begin{table}
+  \centering
+  \begin{tabular}{|l|r|}
+    \hline Metrica & Copertura percentuale \\
+    \hline
+    \hline Istruzioni & $84.07\%$ \\
+    \hline Branches   & $77.24\%$ \\
+    \hline Funzioni   & $82.14\%$ \\
+    \hline Righe      & $84.92\%$ \\
+    \hline
+  \end{tabular}
+  \caption{Coverage totale per il front-end}
+  \label{tab:code-coverage-front-end-it2}
+\end{table}

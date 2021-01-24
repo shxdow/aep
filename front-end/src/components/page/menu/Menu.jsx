@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import CollapsableSection from './MenuCollapsableSection';
@@ -9,6 +9,7 @@ import MenuSectionOpenContext from './menuSectionOpen.context';
 
 const Menu = () => {
   const [sectionOpen, setSectionOpen] = useState('');
+  const [isClient, setIsClient] = useState(false);
 
   const updateSection = useCallback((newSection) => {
     setSectionOpen((prevSection) => (prevSection === newSection ? '' : newSection));
@@ -18,6 +19,10 @@ const Menu = () => {
     sectionOpen,
     setSectionOpen: updateSection,
   }), [updateSection, sectionOpen]);
+
+  useEffect(() => {
+    setIsClient(!!sessionStorage.getItem('client'));
+  }, []);
 
   return (
     <MenuSectionOpenContext.Provider value={value}>
@@ -34,7 +39,7 @@ const Menu = () => {
         <Divider />
 
         <CollapsableSection id="tickets" text="Ticket" icon="fa fa-clipboard-list">
-          <SectionItem to="/tickets/new" text="Apri un nuovo ticket" />
+          {isClient && <SectionItem to="/tickets/new" text="Apri un nuovo ticket" />}
           <SectionItem to="/tickets" text="I tuoi ticket" />
         </CollapsableSection>
 

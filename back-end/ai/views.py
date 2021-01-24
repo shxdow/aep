@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login, logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User, Group as DjangoGroup
 from django.forms.models import model_to_dict
-from django.http import Http404, HttpResponse, QueryDict
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import status
@@ -18,6 +18,13 @@ from rest_framework.renderers import JSONRenderer
 from .models import Ticket, Group, Operator, Account, Client, Comment
 
 
+def decode_json_body(request):
+    """
+        Decode the JSON-formatted body of a request
+    """
+    return json.loads(request.body.decode('utf-8'))
+
+
 @csrf_exempt
 def signup(request):
     """
@@ -25,8 +32,7 @@ def signup(request):
     """
 
     try:
-        body_unicode = request.body.decode('utf-8')
-        request.POST = json.loads(body_unicode)
+        request.POST = decode_json_body(request)
         user = User.objects.create_user(username=request.POST["username"],
                                         password=request.POST["password"])
         user.save()
@@ -43,9 +49,7 @@ def auth(request):
         Allow login for users
     """
 
-    body_unicode = request.body.decode('utf-8')
-    request.POST = json.loads(body_unicode)
-
+    request.POST = decode_json_body(request)
     user = authenticate(username=request.POST["username"],
                         password=request.POST["password"])
     if user is not None:
@@ -63,7 +67,7 @@ def auth(request):
         except:
             client = None
 
-        return HttpResponse({
+        return JsonResponse({
             'client': client,
             'account': user.account.id,
         })
@@ -89,8 +93,7 @@ def add_operator(request):
     try:
         if not request.user.is_superuser:
             return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
-        body_unicode = request.body.decode('utf-8')
-        request.POST = json.loads(body_unicode)
+        request.POST = decode_json_body(request)
         user = User.objects.create_user(username=request.POST["username"],
                                         password=request.POST["password"])
 
@@ -102,7 +105,7 @@ def add_operator(request):
         acc.save()
         operator = Operator(account=acc, group=None)
         operator.save()
-    except Exception as e:
+    except:
         return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return HttpResponse(status=status.HTTP_201_CREATED)
 
@@ -113,8 +116,7 @@ def add_client(request):
     """
 
     try:
-        body_unicode = request.body.decode('utf-8')
-        request.POST = json.loads(body_unicode)
+        request.POST = decode_json_body(request)
         user = User.objects.create_user(username=request.POST["username"],
                                         password=request.POST["password"])
 
@@ -123,7 +125,7 @@ def add_client(request):
         acc.save()
         client = Client(account=acc)
         client.save()
-    except Exception as e:
+    except:
         return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return HttpResponse(status=status.HTTP_201_CREATED)
 
@@ -135,15 +137,14 @@ def add_ticket(request):
         Let someone add a ticket
     """
     try:
-        body_unicode = request.body.decode('utf-8')
-        request.POST = json.loads(body_unicode)
+        request.POST = decode_json_body(request)
         ticket = Ticket.objects.create(
             title=request.POST["title"],
             description=request.POST["description"],
             client=Client.objects.get(pk=request.POST["client"]))
 
         ticket.save()
-    except Exception as e:
+    except:
         return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return HttpResponse(status=status.HTTP_201_CREATED)
 
@@ -155,8 +156,7 @@ def add_comment(request):
         Let someone leave a comment to a ticket
     """
     try:
-        body_unicode = request.body.decode('utf-8')
-        request.POST = json.loads(body_unicode)
+        request.POST = decode_json_body(request)
         account = Account.objects.get(pk=request.POST["account"])
         ticket = Ticket.objects.get(pk=request.POST["ticket"])
         comment = Comment.objects.create(timestamp=request.POST["timestamp"],
@@ -165,7 +165,7 @@ def add_comment(request):
                                          content=request.POST["content"])
 
         comment.save()
-    except Exception as e:
+    except:
         return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return HttpResponse(status=status.HTTP_201_CREATED)
 
@@ -178,8 +178,7 @@ def add_group(request):
     """
 
     try:
-        body_unicode = request.body.decode('utf-8')
-        request.POST = json.loads(body_unicode)
+        request.POST = decode_json_body(request)
         group = Group.objects.create(description=request.POST["description"])
         group.save()
     except:
@@ -201,27 +200,26 @@ def handle_group(request, pk):
     if request.method == 'GET':
         try:
             group = model_to_dict(Group.objects.get(pk=pk))
-            return HttpResponse(group)
-        except Group.DoesNotExist as ex:
+            return JsonResponse(group)
+        except Group.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     elif request.method == 'PUT':
         try:
-            body_unicode = request.body.decode('utf-8')
-            request.PUT = json.loads(body_unicode)
+            request.PUT = decode_json_body(request)
             Group.objects.filter(pk=pk).update(
                 description=request.PUT["description"])
-            return HttpResponse(status=status.HTTP_200_OK)
-        except Group.DoesNotExist as ex:
+        except Group.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     elif request.method == 'DELETE':
         try:
             group = Group.objects.get(pk=pk)
             group.delete()
-            return HttpResponse(status=status.HTTP_200_OK)
-        except Group.DoesNotExist as ex:
+        except Group.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    return HttpResponse(status=status.HTTP_200_OK)
 
 
 @login_required
@@ -240,28 +238,27 @@ def handle_operator(request, pk):
             operator = model_to_dict(Operator.objects.get(pk=pk))
             operator["account"] = model_to_dict(
                 Operator.objects.get(pk=pk).account)
-            return HttpResponse(operator)
-        except Operator.DoesNotExist as ex:
+            return JsonResponse(operator)
+        except Operator.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     elif request.method == 'PUT':
         try:
-            body_unicode = request.body.decode('utf-8')
-            request.PUT = json.loads(body_unicode)
+            request.PUT = decode_json_body(request)
             Operator.objects.filter(pk=pk).update(group=request.PUT["group"])
             Account.objects.filter(pk=request.PUT["account"]["id"]).update(
                 email=request.PUT["account"]["email"])
-            return HttpResponse(status=status.HTTP_200_OK)
-        except Operator.DoesNotExist as ex:
+        except Operator.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     elif request.method == 'DELETE':
         try:
             operator = Operator.objects.get(pk=pk)
             operator.delete()
-            return HttpResponse(status=status.HTTP_200_OK)
-        except Operator.DoesNotExist as ex:
+        except Operator.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    return HttpResponse(status=status.HTTP_200_OK)
 
 
 @login_required
@@ -275,11 +272,11 @@ def handle_comment(request, pk):
     if request.method == 'GET':
         try:
             ticket = model_to_dict(Comment.objects.get(pk=pk))
-            return HttpResponse(ticket)
-        except Comment.DoesNotExist as ex:
+            return JsonResponse(ticket)
+        except Comment.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
-    else:
-        return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @login_required
@@ -288,7 +285,10 @@ def get_tickets(request):
     """
         Get all tickets in the database
     """
-    return HttpResponse(Ticket.objects.all())
+    return JsonResponse(
+        list(map(model_to_dict, Ticket.objects.all())),
+        safe=False,
+    )
 
 
 @login_required
@@ -304,18 +304,18 @@ def handle_ticket(request, pk):
 
             comments = list(
                 map(model_to_dict, Comment.objects.filter(ticket=pk)))
-            for c in comments:
-                c['account'] = model_to_dict(
-                    Account.objects.get(pk=c['account']))['name']
+            for comment in comments:
+                comment['account'] = model_to_dict(
+                    Account.objects.get(pk=comment['account']))['name']
 
-            return Response({
+            return JsonResponse({
                 'title': ticket['title'],
                 'description': ticket['description'],
                 'status': ticket['status'],
                 'group': ticket['group'],
                 'comments': comments,
             })
-        except Ticket.DoesNotExist as ex:
+        except Ticket.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     elif request.method == 'PUT':
         try:
@@ -323,16 +323,16 @@ def handle_ticket(request, pk):
                 print(request.user.groups.all())
                 return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
 
-            body_unicode = request.body.decode('utf-8')
-            request.PUT = json.loads(body_unicode)
+            request.PUT = decode_json_body(request)
             ticket = Ticket.objects.get(pk=pk)
             ticket.status = request.PUT["status"]
             ticket.save()
-            return HttpResponse(status=status.HTTP_200_OK)
-        except Client.DoesNotExist as ex:
+        except Client.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    return HttpResponse(status=status.HTTP_200_OK)
 
 
 @login_required
@@ -350,24 +350,23 @@ def handle_client(request, pk):
             client = model_to_dict(Client.objects.get(pk=pk))
             client["account"] = model_to_dict(
                 Client.objects.get(pk=pk).account)
-            return HttpResponse(client)
-        except Client.DoesNotExist as ex:
+            return JsonResponse(client)
+        except Client.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     elif request.method == 'PUT':
         try:
-            body_unicode = request.body.decode('utf-8')
-            request.PUT = json.loads(body_unicode)
+            request.PUT = decode_json_body(request)
             Account.objects.filter(pk=request.PUT["account"]["id"]).update(
                 email=request.PUT["account"]["email"])
-            return HttpResponse(status=status.HTTP_200_OK)
-        except Client.DoesNotExist as ex:
+        except Client.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     elif request.method == 'DELETE':
         try:
             client = Client.objects.get(pk=pk)
             client.delete()
-            return HttpResponse(status=status.HTTP_200_OK)
-        except Client.DoesNotExist as ex:
+        except Client.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    return HttpResponse(status=status.HTTP_200_OK)

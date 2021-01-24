@@ -1,0 +1,46 @@
+.separator {
+  height: 20px;
+}
+
+.slim-button {
+  height: 38px;
+  padding: 0;
+}
+
+.ticket-info {
+  display: flex;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.ticket-info-label {
+  width: 25%;
+  font-weight: bold;
+}
+
+.ticket-info-content {
+  flex-grow: 1;
+  font-style: italic;
+}
+
+.ticket-info-control {
+  flex-grow: 1;
+  max-width: 200px;
+}
+
+.ticket-comment {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.ticket-comment-from {
+  font-style: italic;
+}
+
+.ticket-comment-content {
+  color: #333;
+  background-color: lightgray;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+}

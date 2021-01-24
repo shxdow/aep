@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Cookies from 'js-cookie';
 import { Link, useHistory } from 'react-router-dom';
 import { Card, Form, Button, Col, Image, Alert } from 'react-bootstrap';
 
@@ -18,7 +17,7 @@ const Login = () => {
   const history = useHistory();
 
   useEffect(() => {
-    if (Cookies.get('token')) {
+    if (sessionStorage.getItem('loggedIn')) {
       history.push('/');
     }
   }, [history]);

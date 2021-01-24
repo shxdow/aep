@@ -17,6 +17,7 @@
 \setlength{\parindent}{0cm}
 \setlength{\parskip}{0.3cm}
 \renewcommand{\arraystretch}{1.2}
+\renewcommand{\baselinestretch}{1.2}
 
 \lstset{
   breaklines=true,
@@ -54,10 +55,10 @@
   \tableofcontents
 
   % ----- EMPTY
-  % \clearpage
-  % \thispagestyle{plain}
-  % \pagenumbering{gobble}
-  % \mbox{}
+  \clearpage
+  \thispagestyle{plain}
+  \pagenumbering{gobble}
+  \mbox{}
 
   \clearpage
   \pagenumbering{arabic}
@@ -68,6 +69,11 @@
   \chapter{Iterazione 1}
   \import{chapters/}{iterazione1.tex}
 
+  \chapter{Iterazione 2}
+  \import{chapters/}{iterazione2.tex}
+
+  \chapter{Toolchain}
+  \import{chapters/}{toolchain.tex}
 
   % ------ BIBLIOGRAFIA
    \nocite{*}

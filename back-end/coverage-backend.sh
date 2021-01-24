@@ -1,4 +1,4 @@
 #!/bin/sh
 
-coverage run --source='.' manage.py test ai
+coverage run --source='ai' manage.py test ai
 coverage html

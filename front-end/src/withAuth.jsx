@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import FakeLoadingPage from './components/page/FakeLoadingPage';
 
@@ -8,11 +7,12 @@ const withAuth = (WrappedComponent) => (props) => {
   const [loading, setLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const history = useHistory();
+  const location = useLocation();
 
   useEffect(() => {
     try {
       setLoading(true);
-      if (Cookies.get('token')) {
+      if (sessionStorage.getItem('loggedIn')) {
         setIsAuthorized(true);
         setLoading(false);
       } else {
@@ -22,6 +22,12 @@ const withAuth = (WrappedComponent) => (props) => {
       setLoading(false);
     }
   }, [history]);
+
+  useEffect(() => {
+    if (location.pathname === '/tickets/new' && !sessionStorage.getItem('client')) {
+      history.push('/');
+    }
+  }, [history, location.pathname]);
 
   if (loading) {
     return <FakeLoadingPage />;
