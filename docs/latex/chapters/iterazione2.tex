@@ -24,11 +24,11 @@ prestazioni sia di complessità nella gestione dell'autenticazione.
 Infatti, il framework dà dei problemi con l'autenticazione fornita da \textit{Django}, in quanto
 può non effettuare il parsing corretto dei cookies di autenticazione in presenza di richieste
 di tipo \texttt{OPTIONS} fatte dai browser.
-Questo tipo di problema ci portava ad avere un'autenticazione funzionante, ma ad una successiva chiamata
-che avesse il tipo \texttt{OPTIONS} il framework rispondeva con \texttt{302} ed effettuava il re-indirizzamento
+Questo tipo di problema ci portava ad avere un'autenticazione funzionante ma, ad una successiva chiamata
+che avesse il tipo \texttt{OPTIONS}, il framework rispondeva con \texttt{302} ed effettuava il re-indirizzamento
 all'endpoint con il metodo corretto, senza però instradare anche i cookies.
 
-Ciò risultava in un login funzionante, ma ogni altra richiesta era come fatta da un utente anonimo.
+Ciò risultava in un login funzionante, ma ogni altra richiesta era come se venisse fatta da un utente anonimo.
 
 \subsection{API endpoints}
 
@@ -107,7 +107,7 @@ La coverage invece è visibile nella relativa cartella ed ammonta all'$85 \%$, c
 
 \subsection{Pagine aggiunte}
 
-Il front end rispecchia le nuove API aggiunte. In particolare, sono state realizzate le seguenti pagine:
+Il front-end rispecchia le nuove API aggiunte. In particolare, sono state realizzate le seguenti pagine:
 
 \begin{itemize}
   \item lista dei ticket;
