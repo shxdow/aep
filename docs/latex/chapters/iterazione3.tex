@@ -117,7 +117,6 @@ di aver trovato una vera appartenenza.
   \Function{AssignGroupToTicket}{$ticket$, $groups$, $S$}
     \State $P \gets \emptyset$ \Comment{Dizionario vuoto}
     \State $words \gets $ \Call{ExtractWords}{$ticket$}
-    \State $G \gets \emptyset$ \Comment{Copia della lista dei gruppi}
     \State
     \ForAll{$word \in words$}
       \ForAll{$(id, scores) \in groups$}
@@ -136,7 +135,7 @@ di aver trovato una vera appartenenza.
     \State $id \gets $ \Call{MaxInDict}{$P$}
     \State $v \gets $ \Call{Get}{$P$, $id$}
     \If{$v > S$}
-      \State \Return ($id$, $groups$)
+      \State \Return $id$
     \Else
       \State \Return \textbf{null}
     \EndIf
