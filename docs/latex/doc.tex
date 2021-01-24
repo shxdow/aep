@@ -5,8 +5,10 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage[italian]{babel}
 \usepackage[utf8]{inputenc}
-\usepackage{csquotes}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithms
+\usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
 \usepackage{array}
+\usepackage{csquotes}
 \usepackage{float}
 \usepackage{graphicx}
 \usepackage{import}
@@ -18,6 +20,7 @@
 \setlength{\parskip}{0.3cm}
 \renewcommand{\arraystretch}{1.2}
 \renewcommand{\baselinestretch}{1.2}
+\floatname{algorithm}{Algoritmo}
 
 \lstset{
   breaklines=true,
@@ -71,6 +74,9 @@
 
   \chapter{Iterazione 2}
   \import{chapters/}{iterazione2.tex}
+
+  \chapter{Iterazione 3}
+  \import{chapters/}{iterazione3.tex}
 
   \chapter{Toolchain}
   \import{chapters/}{toolchain.tex}

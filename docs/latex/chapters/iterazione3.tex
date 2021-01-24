@@ -1,0 +1,185 @@
+In questa iterazione abbiamo implementato il cuore algoritmico del progetto: l'assegnamento non
+supervisionato di un ticket ad un gruppo e la stima statistica del tempo di risoluzione.
+
+\section{Descrizione dell'algoritmo}
+
+L'algoritmo proposto si occupa dell'individuazione automatica di un gruppo di operatori a cui
+assegnare il ticket. Ciò è fatto tramite una variante dell'algoritmo \textit{k-means}, usato in ambito
+di Machine Learning per la classificazione non supervisionata di un esemplare in diversi gruppi derivati
+dalle \textit{feature} della popolazione.
+
+I passi base di \textit{k-means} sono:
+\begin{enumerate}
+  \item Dato un esemplare da classificare e una popolazione già classificata, calcolare una \textit{distanza} tra
+        questo esemplare e gli altri esemplari della popolazione;
+  \item Prendere i $k$ elementi con la distanza minore;
+  \item Assegnare all'esemplare il gruppo che compare più volte in questi $k$ elementi;
+  \item Se non è possibile assegnare un gruppo o la distanza è troppo alta, allora l'elemento appartiene ad un nuovo gruppo.
+\end{enumerate}
+
+La ``distanza'' è intesa in modo astratto, in quanto rappresenta solamente quanto due elementi sono vicini
+in base alle \textit{feature} scelte, non necessariamente una distanza geografica.
+
+Nel nostro caso questi gruppi sono creati a priori, poiché devono necessariamente riflettere la
+situazione reale pre-esistente nell'azienda che utilizza il prodotto.
+
+Inoltre, i ticket in un'azienda sono mantenuti idealmente per un tempo indefinito, quindi possono aumentare
+di molto in numero con l'avanzare del tempo. Per questo motivo, abbiamo pensato di ottimizzare l'algoritmo
+con l'introduzione di strutture dati aggiuntive sui gruppi che racchiudano una sintesi delle feature dei ticket
+appartenenti al gruppo stesso.
+Queste strutture dati sono poi aggiornate ad ogni assegnamento di un nuovo ticket.
+
+Tale struttura è semplicemente una \textit{hashmap}, che usa delle parole come chiavi e dei numeri reali come valori.
+Le parole non sono tutte quelle della lingua italiana, ma devono soddisfare almeno una delle seguenti:
+\begin{enumerate}
+  \item essere lunghe almeno $5$ caratteri;
+  \item appartenere al dominio operativo dell'azienda.
+\end{enumerate}
+
+Grazie a questa ottimizzazione è quindi possibile evitare di analizzare un numero elevato di ticket
+rendendo l'algoritmo adatto all'uso \textit{on-the-fly}, al momento della creazione stessa del ticket.
+Così facendo l'integrazione con il codice già esistente risulta semplificata e non c'è bisogno di
+richiedere nessuna azione esterna al sistema.
+
+I passi base del nostro algoritmo sono quindi:
+
+\begin{enumerate}
+  \item Dato un ticket da assegnare, analizzare il suo contenuto e confrontarlo con le informazioni derivate del gruppo;
+  \item Calcolare un \textit{punteggio}, che è tanto maggiore quanto la possibilità che un ticket appartenga ad un gruppo;
+  \item Trovare il gruppo con il punteggio massimo;
+  \item Assegnare il ticket al gruppo e aggiornare la struttura dati aggiuntiva del gruppo relativo.
+\end{enumerate}
+
+È presente un'ulteriore funzionalità: la stima del tempo di risoluzione.
+Dopo che un ticket viene assegnato ad un gruppo, è possibile basarsi sugli ultimi $x$ ticket chiusi per poter
+stimare in quanto tempo il problema individuato dal ticket sarà risolto.
+È stato preso un numero finito di ticket sia per motivi di ottimizzazione della stima di un modello stocastico,
+sia per evitare che dati troppo vecchi, che magari rispecchiano una diversa e meno performante struttura dell'azienda,
+vengano presi in considerazione.
+
+\section{Flowchart}
+
+% TODO: Fare il flowchart
+
+\section{Pseudocodice}
+
+Lo pseudocodice dell'algoritmo di assegnamento è l'algoritmo \ref{alg:ticket-assign}.
+In esso è possibile vedere alcune funzioni particolari:
+\begin{itemize}
+  \item \texttt{ExtractWords}, usata per ottenere l'elenco delle parole dal titolo e dalla descrizione del ticket, rimuovendo la punteggiatura;
+  \item \texttt{Push}, che aggiunge un elemento ad una lista;
+  \item \texttt{Get} per ottenere il valore di una chiave da una hashmap;
+  \item \texttt{Increment}, che aumenta un valore in una hashmap secondo una chiave, o lo inserisce se non esiste.
+\end{itemize}
+
+Nel codice è presente anche una soglia \texttt{S}, che rappresenta il valore minimo per cui si può considerare
+di aver trovato una vera appartenenza.
+
+\begin{algorithm}
+  \caption{Assegnamento di un ticket ad un gruppo}\label{alg:ticket-assign}
+  \begin{algorithmic}[1]
+  \Function{AssignGroupToTicket}{$ticket$, $groups$, $S$}
+    \State $P \gets \emptyset$ \Comment{HashMap vuota}
+    \State $words \gets $ \Call{ExtractWords}{$ticket$}
+    \State $G \gets \emptyset$ \Comment{Copia della lista dei gruppi}
+    \State
+    \ForAll{$g \in groups$}
+      \State \Call{Push}{$G$, $g$}
+    \EndFor
+    \State
+    \ForAll{$word \in words$}
+      \ForAll{$(id, scores) \in G$}
+        \If{$word \in scores$}
+          \State $w \gets $ \Call{Get}{$scores$, $word$}
+        \Else
+          \State $w \gets 0$
+        \EndIf
+
+        \State \Call{Increment}{$P$, $id$, $w$}
+        \State $k \gets $ \Call{WeightUpdate}{$w$}
+        \State \Call{Set}{$scores$, $w$, $w + k$}
+      \EndFor
+    \EndFor
+    \State
+    \State $id \gets $ \Call{MaxInHash}{$P$}
+    \State $v \gets $ \Call{Get}{$P$, $id$}
+    \If{$v > S$}
+      \State \Return ($id$, $G$)
+    \Else
+      \State \Return \textbf{null}
+    \EndIf
+  \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+L'algoritmo \ref{alg:weight-update} rappresenta invece come vengono aggiornati i pesi nei gruppi:
+\begin{enumerate}
+  \item se il peso esistente è alto, significa che vogliamo associare la parola al gruppo, quindi viene aumentato;
+  \item se il peso esistente è piccolo, lo si aumenta di poco, questo per diminuire la possibilità di falsi positivi;
+  \item se il peso è invece negativo, allora si vuole penalizzare ancora di più.
+\end{enumerate}
+
+All'inizio i pesi possono essere tutti nulli, oppure l'azienda ha la possibilità di impostarne alcuni manualmente.
+Ad esempio, per un ipotetico gruppo di operatori che si occupano di un'applicazione mobile, si potrebbe assegnare un peso
+alto alla parola ``mobile'' oppure ``app''.
+
+\begin{algorithm}
+  \caption{Calcolo del termine di aggiornamento di un peso}\label{alg:weight-update}
+  \begin{algorithmic}[1]
+    \Function{WeightUpdate}{$x$}
+      \If{$x > 1$}
+        \State \Return $0.5$
+      \ElsIf{$x \ge 0$}
+        \State \Return $0.1$
+      \Else
+        \State \Return $-0.5$
+      \EndIf
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+L'algoritmo \ref{alg:max-in-hash} è invece la ricerca della chiave con il valore massimo in una hashmap.
+Abbiamo supposto che sia possibile accedere all'elenco delle chiavi di una hashmap per
+poterle analizzare una ad una.
+
+\begin{algorithm}
+  \caption{Ottenimento della chiave con il valore massimo in una HashMap}\label{alg:max-in-hash}
+  \begin{algorithmic}[1]
+    \Function{MaxInHash}{$h$}
+      \State $v_{max} \gets $ \textbf{null}
+      \State $k_{max} \gets $ \textbf{null}
+      \ForAll{$k \in h$}
+        \State $v \gets $ \Call{Get}{$h$, $k$}
+        \If{$v_{max} =$ \textbf{null} $\vee\ v > v_{max}$}
+          \State $v_{max} \gets v$
+          \State $k_{max} \gets k$
+        \EndIf
+      \EndFor
+
+      \State \Return $k_{max}$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+Infine, l'algoritmo \ref{alg:ticket-time-estimate} racchiude i passi base per la stima del tempo
+di risoluzione di un ticket. Dato un elenco di ticket passati, l'algoritmo calcola prima tutte gli
+intervalli di tempo per cui dei ticket sono stati aperti. A questo punto, viene stimato un modello
+ARIMA su queste differenze e poi, grazie ai coefficienti trovati, viene effettuata una predizione.
+
+\begin{algorithm}
+  \caption{Stima tempo di risoluzione}\label{alg:ticket-time-estimate}
+  \begin{algorithmic}[1]
+  \Function{EstimateTime}{$tickets$}
+    \State $times \gets \emptyset$ \Comment{Lista vuota}
+    \ForAll{$t \in tickets$}
+      \If{\Call{Stato}{$t$} $=$ `Chiuso'}
+        \State $\Delta t \gets$ \Call{Fine}{$t$} $-$ \Call{Inizio}{$t$}
+        \State \Call{Push}{$tickets$, $\Delta t$}
+      \EndIf
+    \EndFor
+    \State $coefs \gets$ \Call{FitArima}{$times$}
+    \State $p \gets $ \Call{Predict}{$coefs$, $times$}
+    \State \Return $p$
+  \EndFunction
+  \end{algorithmic}
+\end{algorithm}
