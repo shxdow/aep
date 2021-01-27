@@ -6,6 +6,7 @@ from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User, Group as DjangoGroup
 from .models import Account, Client, Group, Operator, Ticket
 from .views import add_ticket, handle_ticket, get_tickets, add_operator, handle_operator, add_client, handle_client, add_group, handle_group, auth, logout
+from .ticketclassifier import increment, extract_words, max_in_dict, weight_update, assign_group_to_ticket, K1, K2, K3
 
 
 class AuthTestCase(TestCase):
@@ -387,3 +388,63 @@ class TicketTestCase(TestCase):
         request.user = self.user
         response = add_client(request)
         self.assertEqual(response.status_code, 500)
+
+
+class TicketClassifierTestCase(TestCase):
+    def setUp(self):
+        pass
+
+    def test_increment(self):
+        dic = {'key': 1}
+        increment(dic, 'key', 2)
+        assert dic['key'] == 3
+        increment(dic, 'missing', 4)
+        assert dic['missing'] == 4
+
+    def test_extract_words(self):
+        ticket = {
+            'title': 'Hello, there!',
+            'description': 'This is the ticket'
+        }
+        words = extract_words(ticket)
+        assert words == ['hello', 'there', 'this', 'is', 'the', 'ticket']
+
+    def test_max_in_dict(self):
+        assert max_in_dict({
+            'a': 1,
+            'b': 2,
+            'c': -3
+        }) == 'b'
+        assert max_in_dict({}) is None
+        assert max_in_dict({1: 7.1, 2: 0.1}) == 1
+
+    def test_weight_update(self):
+        assert weight_update(2) == K1
+        assert weight_update(1) == K2
+        assert weight_update(0) == K2
+        assert weight_update(-1) == K3
+
+    def test_assign_group(self):
+        ticket = {
+            'title': 'Non riesco a fare il login al portale',
+            'description': 'Ho provato di tutto ma non mi accetta la password'
+        }
+        groups = [
+            (1, {
+                'portale': 5,
+                'login': 1,
+                'password': 1
+            }),
+            (2, {
+                'app': 3,
+                'mobile': 2,
+                'telefono': 0.3
+            })
+        ]
+
+        gid = assign_group_to_ticket(ticket, groups, 6)
+        assert gid == 1
+        _, scores = groups[0]
+        assert scores['portale'] == 5 + K1
+        assert scores['login'] == 1 + K2
+        assert scores['password'] == 1 + K2

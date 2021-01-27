@@ -34,7 +34,7 @@ def assign_group_to_ticket(ticket, groups, threshold):
             increment(scores, word, weight_update(point))
 
     gid = max_in_dict(points)
-    return points[gid] if points[gid] > threshold else None
+    return gid if points[gid] > threshold else None
 
 
 def increment(dic, key, val):
@@ -94,6 +94,8 @@ def max_in_dict(dic):
         ### Valore ritornato
         La chiave con il valore massimo in `dic`
     """
+    if not dic:
+        return None
     return max(dic, key=lambda k: dic[k])
 
 
