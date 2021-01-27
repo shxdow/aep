@@ -217,3 +217,111 @@ ARIMA su queste differenze e poi, grazie ai coefficienti trovati, viene effettua
   \EndFunction
   \end{algorithmic}
 \end{algorithm}
+
+\section{Analisi di complessità}
+
+\subsection{Classificazione ticket}
+
+Per l'assegnazione del ticket in un gruppo, è necessario prendere in considerazione la dimensione
+degli input.
+
+Poniamo quindi $n$ il numero di parole contenute nel titolo e nella descrizione del ticket e $m$ il numero
+di gruppi pre-esistenti.
+
+Possiamo anche supporre che $k$ sia il numero di caratteri complessivi del ticket (compresi sia nel titolo sia
+nella descrizione).
+In questo caso l'\textbf{estrazione delle parole} si compone di due fasi:
+\begin{enumerate}
+  \item lo splitting delle parole con rimozione dei caratteri non alfabetici;
+  \item la trasformazione in \textit{lower case} di ogni parola.
+\end{enumerate}
+
+In tutto quindi la stringa composta dall'accostamento di titolo e descrizione dev'essere attraversata due volte:
+la prima per l'esecuzione della regex e la seconda per la trasformazione in minuscolo.
+Di conseguenza la complessità per l'ottenimento delle parole risulta essere
+\begin{equation*}
+  O(2k) = O(k)
+\end{equation*}
+
+Inoltre, poiché $k \propto n$, si ha che la complessità può essere espressa in termini sia di $k$ sia di $n$, tenendo
+conto che, in un numero significativo dei casi, $k \gg n$. Noi la esprimeremo in funzione di $n$.
+
+Il prossimo passo nell'algoritmo consiste nei due \textbf{cicli annidati}. Si ha che
+\begin{itemize}
+  \item il ciclo più esterno viene eseguito esattamente $n$ volte, una volta per parola;
+  \item il ciclo più interno viene eseguito $m$ volte per ogni parola.
+\end{itemize}
+
+Bisogna quindi stimare il corpo del ciclo interno. Supponendo di usare una struttura dati dizionario
+con tempi di accesso, aggiunta, modifica e lookup delle \textit{chiavi} pari a $O(1)$, è facile notare che:
+\begin{itemize}
+  \item la funzione \texttt{Increment} è $O(1)$ per via dell'uso di questa struttura;
+  \item la funzione \texttt{WeightUpdate} è $O(1)$ poiché non dipende in alcun modo dalla dimensione dati in input.
+\end{itemize}
+
+Ne consegue quindi che il corpo del ciclo interno è a sua volta $O(1)$.
+Quindi il tempo dei due cicli annidati è complessivamente
+\begin{equation*}
+  \Theta(nm)
+\end{equation*}
+
+Infine, la \textbf{ricerca del gruppo con il punteggio massimo}. Come è possibile intuire facilmente dallo
+pseudocodice nell'algoritmo \ref{alg:max-in-dict}, bisogna analizzare una volta ogni gruppo.
+Il ciclo viene quindi eseguito $m$ volte, e con un corpo con complessità $O(1)$ risulta che quest'ultima
+operazione ha complessità
+\begin{equation*}
+  \Theta(m)
+\end{equation*}
+
+Le ultime azioni (righe 19-24) hanno invece complessità costante.
+
+Quindi, per riassumere
+\begin{equation*}
+  \begin{cases}
+    O(n) & \text{separazione delle parole} \\
+    \Theta(nm) & \text{costruzione dei punteggi} \\
+    \Theta(m) & \text{ricerca del massimo}
+  \end{cases}
+  \implies
+  O(n + nm + m) \text{ complessità totale}
+\end{equation*}
+
+\subsection{Stima ARIMA del tempo di esecuzione}
+
+La complessità di questo algoritmo verrà calcolata in base al numero $n$ di ticket usati per la stima.
+
+Il \textbf{calcolo dei tempi} in cui ogni ticket è stato aperto ha complessità $O(1)$ e viene eseguito esattamente
+$n$ volte. Inoltre, si suppone che l'ottenimento della data di apertura e della data di chiusura di un
+ticket siano operazioni $O(1)$.
+Di conseguenza, il calcolo iniziale dei tempi risulta essere
+\begin{equation*}
+  \Theta(n)
+\end{equation*}
+
+La \textbf{stima dei coefficienti} è il prossimo passo.
+Seppur lasciata ad una libreria esterna, questa utilizza il metodo della \textit{MLE} tramite \textit{innovazioni}
+con un algoritmo di \textit{gradient descent}.
+Questo tipo di algoritmo dipende da due dati: il numero $n$ di dati in ingresso, dei quali sarà calcolato
+il gradiente, ed un numero $p$ di regressori usati. Inoltre, questo tipo di algoritmo ha prestazioni che possono
+variare fortemente in base al problema preso in considerazione.
+
+Per i nostri scopi, è lecito supporre che $p \ll n$ e che l'operazione di gradiente sia dipendente
+linearmente da $n$, quindi la complessità risulta
+\begin{equation*}
+  O(n)
+\end{equation*}
+
+Infine, la \textbf{predizione} è semplicemente una combinazione lineare tra i $p$ coefficienti stimati e gli
+ultimi $p$ tempi di risoluzione. Poiché abbiamo supposto $p \ll n$, questa operazione è effettivamente $O(1)$,
+ma anche togliendo questa supposizione si ha complessità pari a $\Theta(n)$ nel caso peggiore.
+
+In conclusione
+\begin{equation*}
+  \begin{cases}
+    \Theta(n) & \text{calcolo dei tempi} \\
+    O(n) & \text{stima} \\
+    O(1) & \text{predizione}
+  \end{cases}
+  \implies
+  O(n) \text{ complessità totale}
+\end{equation*}
