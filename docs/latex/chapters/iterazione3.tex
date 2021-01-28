@@ -24,24 +24,24 @@ Nel nostro caso questi gruppi sono creati a priori, poiché devono necessariamen
 situazione reale pre-esistente nell'azienda che utilizza il prodotto.
 
 Inoltre, i ticket in un'azienda sono mantenuti idealmente per un tempo indefinito, quindi possono aumentare
-di molto in numero con l'avanzare del tempo. Per questo motivo, abbiamo pensato di ottimizzare l'algoritmo
-con l'introduzione di strutture dati aggiuntive sui gruppi che racchiudano una sintesi delle feature dei ticket
+molto di numero con l'avanzare del tempo. Per questo motivo, abbiamo pensato di ottimizzare l'algoritmo
+introducendo strutture dati aggiuntive sui gruppi che racchiudono una sintesi delle feature dei ticket
 appartenenti al gruppo stesso.
 Queste strutture dati sono poi aggiornate ad ogni assegnamento di un nuovo ticket.
 
 Tale struttura è semplicemente un \textit{dizionario} che usa delle parole come chiavi e dei numeri reali come valori.
-Le parole non sono tutte quelle della lingua italiana, ma devono soddisfare almeno una delle seguenti:
+Le parole non sono tutte quelle della lingua italiana, ma devono soddisfare almeno uno dei seguenti criteri:
 \begin{enumerate}
-  \item essere lunghe almeno $5$ caratteri;
-  \item appartenere al dominio operativo dell'azienda.
+  \item Essere lunghe almeno $5$ caratteri;
+  \item Appartenere al dominio operativo dell'azienda.
 \end{enumerate}
 
 Grazie a questa ottimizzazione è quindi possibile evitare di analizzare un numero elevato di ticket
 rendendo l'algoritmo adatto all'uso \textit{on-the-fly}, al momento della creazione stessa del ticket.
 Così facendo l'integrazione con il codice già esistente risulta semplificata e non c'è bisogno di
-richiedere nessuna azione esterna al sistema.
+richiedere un'azione esterna al sistema.
 
-I passi base del nostro algoritmo sono quindi:
+I passi base del nostro algoritmo sono:
 
 \begin{enumerate}
   \item Dato un ticket da assegnare, analizzare il suo contenuto e confrontarlo con le informazioni derivate del gruppo;
@@ -50,9 +50,9 @@ I passi base del nostro algoritmo sono quindi:
   \item Assegnare il ticket al gruppo e aggiornare la struttura dati aggiuntiva del gruppo relativo.
 \end{enumerate}
 
-È presente un'ulteriore funzionalità: la stima del tempo di risoluzione.
+È presente un'ulteriore funzionalità: \textit{la stima del tempo di risoluzione}.
 Dopo che un ticket viene assegnato ad un gruppo, è possibile basarsi sugli ultimi $x$ ticket chiusi per poter
-stimare in quanto tempo il problema individuato dal ticket sarà risolto.
+stimare in quanto tempo il problema riscontrato dal ticket sarà risolto.
 È stato preso un numero finito di ticket sia per motivi di ottimizzazione della stima di un modello stocastico,
 sia per evitare che dati troppo vecchi, che magari rispecchiano una diversa e meno performante struttura dell'azienda,
 vengano presi in considerazione.
@@ -72,7 +72,7 @@ Sono anche presenti dei riferimenti ad altri flowchart (i rettangoli con i doppi
 
 Il flowchart \ref{fig:flowchart-aggiornamento-peso} rappresenta la logica di aggiornamento dei pesi:
 \begin{itemize}
-  \item il peso viene aumentato sostanzialmente se il suo valore è alto;
+  \item il peso viene aumentato in modo sostanziale se il suo valore è alto;
   \item il peso viene aumentato di poco se il suo valore è basso;
   \item il peso viene diminuito se è negativo.
 \end{itemize}
@@ -146,12 +146,12 @@ di aver trovato una vera appartenenza.
 L'algoritmo \ref{alg:weight-update} rappresenta invece come vengono aggiornati i pesi nei gruppi:
 \begin{enumerate}
   \item se il peso esistente è alto, significa che vogliamo associare la parola al gruppo, quindi viene aumentato;
-  \item se il peso esistente è piccolo, lo si aumenta di poco, questo per diminuire la possibilità di falsi positivi;
-  \item se il peso è invece negativo, allora si vuole penalizzare ancora di più.
+  \item se il peso esistente è piccolo, lo si aumenta di poco, per diminuire la possibilità di falsi positivi;
+  \item se il peso è invece negativo, allora si penalizza ancora di più.
 \end{enumerate}
 
 In questo algoritmo, $K_1$ rappresenta un numero positivo maggiore di $1$, $K_2$ è un valore positivo compreso
-tra $0$ e $1$ e $K_3$ è un numero negativo. Questi numeri saranno tarati su base di prove sperimentali
+tra $0$ e $1$ e $K_3$ è un numero negativo. Questi numeri saranno tarati su base di prove sperimentali.
 
 All'inizio i pesi possono essere tutti nulli, oppure l'azienda ha la possibilità di impostarne alcuni manualmente.
 Ad esempio, per un ipotetico gruppo di operatori che si occupano di un'applicazione mobile, si potrebbe assegnare un peso
@@ -265,8 +265,8 @@ Quindi il tempo dei due cicli annidati è complessivamente
   \Theta(nm)
 \end{equation*}
 
-Infine, la \textbf{ricerca del gruppo con il punteggio massimo}. Come è possibile intuire facilmente dallo
-pseudocodice nell'algoritmo \ref{alg:max-in-dict}, bisogna analizzare una volta ogni gruppo.
+Infine, la \textbf{ricerca del gruppo con il punteggio massimo}. Come è possibile intuire dallo
+pseudocodice nell'algoritmo \ref{alg:max-in-dict}, bisogna analizzare ogni gruppo una volta.
 Il ciclo viene quindi eseguito $m$ volte, e con un corpo con complessità $O(1)$ risulta che quest'ultima
 operazione ha complessità
 \begin{equation*}
