@@ -4,6 +4,8 @@
 """
 
 import re
+from datetime import timedelta
+from statsmodels.tsa.arima.model import ARIMA
 
 K1 = 1
 K2 = 0.1
@@ -99,6 +101,18 @@ def max_in_dict(dic):
     return max(dic, key=lambda k: dic[k])
 
 
+def diff_in_seconds(ticket):
+    """
+        Estrae il delta in secondi tra la fine e l'inizio del ticket t
+        ### Parametri
+        - `t`: il ticket da analizzare
+
+        ### Valore ritornato
+        Il delta tra fine ed inizio in secondi
+    """
+    return (ticket['fine'] - ticket['inizio']).total_seconds()
+
+
 def estimate_time(tickets):
     """
         Fa una stima del tempo di chiusura basata su un elenco di ticket
@@ -110,7 +124,8 @@ def estimate_time(tickets):
         ### Valore ritornato
         Una predizione del tempo impiegato per chiudere il prossimo ticket
     """
-    times = map(lambda t: t['fine'] - t['inizio'], tickets)
-    # TODO: fit arima on times
-    # TODO: return prediction
-    return 0
+    times = list(map(diff_in_seconds, tickets))
+    mod = ARIMA(times)
+    fitted = mod.fit()
+    forecast = fitted.forecast(1, alpha=0.05)
+    return timedelta(seconds=forecast[0])

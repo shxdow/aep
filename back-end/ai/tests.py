@@ -4,9 +4,10 @@
 
 from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User, Group as DjangoGroup
+from datetime import datetime, timedelta
 from .models import Account, Client, Group, Operator, Ticket
-from .views import add_ticket, handle_ticket, get_tickets, add_operator, handle_operator, add_client, handle_client, add_group, handle_group, auth, logout
-from .ticketclassifier import increment, extract_words, max_in_dict, weight_update, assign_group_to_ticket, K1, K2, K3
+from .views import add_ticket, handle_ticket, get_tickets, add_operator, handle_operator, add_client, handle_client, add_group, handle_group
+from .ticketclassifier import increment, extract_words, max_in_dict, weight_update, assign_group_to_ticket, K1, K2, K3, estimate_time
 
 
 class AuthTestCase(TestCase):
@@ -448,3 +449,17 @@ class TicketClassifierTestCase(TestCase):
         assert scores['portale'] == 5 + K1
         assert scores['login'] == 1 + K2
         assert scores['password'] == 1 + K2
+
+    def test_predict_ticket_end(self):
+        tickets = [{
+            'inizio': datetime(2020, 1, 1),
+            'fine': datetime(2020, 1, 2),
+        }, {
+            'inizio': datetime(2020, 1, 1),
+            'fine': datetime(2020, 1, 3),
+        }, {
+            'inizio': datetime(2020, 1, 4),
+            'fine': datetime(2020, 1, 5),
+        }]
+
+        assert type(estimate_time(tickets)) == timedelta
