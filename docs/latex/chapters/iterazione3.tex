@@ -1,0 +1,328 @@
+In questa iterazione abbiamo implementato il cuore algoritmico del progetto: l'assegnamento non
+supervisionato di un ticket ad un gruppo e la stima statistica del tempo di risoluzione.
+
+\section{Descrizione dell'algoritmo}
+
+L'algoritmo proposto si occupa dell'individuazione automatica di un gruppo di operatori a cui
+assegnare il ticket. Ciò è fatto tramite una variante dell'algoritmo \textit{k-means}, usato in ambito
+di Machine Learning per la classificazione non supervisionata di un esemplare in diversi gruppi derivati
+dalle \textit{feature} della popolazione.
+
+I passi base di \textit{k-means} sono:
+\begin{enumerate}
+  \item Dato un esemplare da classificare e una popolazione già classificata, calcolare una \textit{distanza} tra
+        questo esemplare e gli altri esemplari della popolazione;
+  \item Prendere i $k$ elementi con la distanza minore;
+  \item Assegnare all'esemplare il gruppo che compare più volte in questi $k$ elementi;
+  \item Se non è possibile assegnare un gruppo o la distanza è troppo alta, allora l'elemento appartiene ad un nuovo gruppo.
+\end{enumerate}
+
+La ``distanza'' è intesa in modo astratto, in quanto rappresenta solamente quanto due elementi sono vicini
+in base alle \textit{feature} scelte, non necessariamente una distanza geografica.
+
+Nel contesto in esame i gruppi sono creati a priori, poiché devono necessariamente riflettere l'organigramma
+aziendale.
+
+Inoltre, il ciclo di vita di un ticket prevede che esso mantenga una forma di persistenza nel sistema per un tempo
+indefinito anche dopo la sua chiusura, aumentando monotonicamente il numero complessivo di essi nel corso del tempo.
+Per questo motivo, abbiamo deciso di ottimizzare l'algoritmo
+introducendo strutture dati di supporto sui gruppi che racchiudono una sintesi delle feature dei ticket
+appartenenti al gruppo stesso.
+Queste strutture dati sono poi aggiornate ad ogni assegnamento di un nuovo ticket.
+
+Tale struttura è semplicemente un \textit{dizionario} che usa delle parole come chiavi e dei numeri reali come valori.
+Le parole non sono tutte quelle della lingua italiana, ma devono soddisfare almeno uno dei seguenti criteri:
+\begin{enumerate}
+  \item Essere lunghe almeno $5$ caratteri;
+  \item Appartenere al dominio operativo dell'azienda.
+\end{enumerate}
+
+Grazie a questa ottimizzazione è quindi possibile evitare di analizzare un numero elevato di ticket
+permettendo all'algoritmo di operare in una modalità \textit{just in time}, al momento della creazione stessa del ticket.
+Così facendo l'integrazione con il codice già esistente risulta semplificata e non è necessario
+richiedere un'azione esterna al sistema.
+
+I passi base del nostro algoritmo sono:
+
+\begin{enumerate}
+  \item Dato un ticket da assegnare, analizzare il suo contenuto e confrontarlo con le informazioni derivate del gruppo;
+  \item Calcolare un \textit{punteggio}, che è tanto maggiore quanto la possibilità che un ticket appartenga ad un gruppo;
+  \item Trovare il gruppo con il punteggio massimo;
+  \item Assegnare il ticket al gruppo e aggiornare la struttura dati aggiuntiva del gruppo relativo.
+\end{enumerate}
+
+È presente un'ulteriore funzionalità: \textit{la stima del tempo di risoluzione}.
+Dopo che un ticket viene assegnato ad un gruppo, è possibile basarsi sugli ultimi $x$ ticket chiusi per poter
+stimare in quanto tempo il ticket verrà chiuso la prima volta.
+È stato considerato un numero finito di ticket sia per motivi di ottimizzazione della stima di un modello stocastico,
+sia per evitare che dati troppo vecchi, che potrebbero potenzialmente rispecchiare una diversa e meno 
+performante struttura dell'azienda, vengano presi in influsicano nel calcolo.
+
+\section{Flowchart}
+
+Nell'immagine \ref{fig:flowchart-assegnamento-ticket} è visibile il flowchart che descrive la logica
+del nostro algoritmo principale, ovvero quello dell'assegnamento di un ticket ad un gruppo.
+Sono anche presenti dei riferimenti ad altri flowchart (i rettangoli con i doppi bordi), che sono definiti successivamente.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{iterazione3/flowchart-assegnamento-ticket.png}
+  \caption{Flowchart di assegnamento di un ticket ad un gruppo}
+  \label{fig:flowchart-assegnamento-ticket}
+\end{figure}
+
+Il flowchart \ref{fig:flowchart-aggiornamento-peso} rappresenta la logica di aggiornamento dei pesi:
+\begin{itemize}
+  \item il peso viene aumentato in modo sostanziale se il suo valore è alto;
+  \item il peso viene aumentato di poco se il suo valore è basso;
+  \item il peso viene diminuito se è negativo.
+\end{itemize}
+
+Questo dà la possibilità di penalizzare alcune parole e dare più importanza ad altre nella ricerca
+di un gruppo adatto al ticket in esame.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\linewidth]{iterazione3/flowchart-aggiornamento-peso.png}
+  \caption{Flowchart per l'aggiornamento del peso di una parola in un gruppo}
+  \label{fig:flowchart-aggiornamento-peso}
+\end{figure}
+
+Infine, in figura \ref{fig:flowchart-massimo-in-dizionario} è presente l'algoritmo per la ricerca del massimo
+in un dizionario.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\linewidth]{iterazione3/flowchart-massimo-in-dizionario.png}
+  \caption{Flowchart per la ricerca della chiave con il valore massimo in un dizionario}
+  \label{fig:flowchart-massimo-in-dizionario}
+\end{figure}
+
+\section{Pseudocodice}
+
+Lo pseudocodice dell'algoritmo di assegnamento è l'algoritmo \ref{alg:ticket-assign}.
+In esso è possibile vedere alcune funzioni particolari:
+\begin{itemize}
+  \item \texttt{ExtractWords}, usata per ottenere l'elenco delle parole dal titolo e dalla descrizione del ticket, rimuovendo la punteggiatura;
+  \item \texttt{Push}, che aggiunge un elemento ad una lista;
+  \item \texttt{Get} per ottenere il valore di una chiave da un dizionario;
+  \item \texttt{Increment}, che aumenta un valore in un dizionario secondo una chiave, o lo inserisce se non esiste.
+\end{itemize}
+
+Nel codice è presente anche una soglia \texttt{S}, che rappresenta il valore minimo per cui si può considerare
+di aver trovato una vera appartenenza.
+
+\begin{algorithm}
+  \caption{Assegnamento di un ticket ad un gruppo}\label{alg:ticket-assign}
+  \begin{algorithmic}[1]
+  \Function{AssignGroupToTicket}{$ticket$, $groups$, $S$}
+    \State $P \gets \emptyset$ \Comment{Dizionario vuoto}
+    \State $words \gets $ \Call{ExtractWords}{$ticket$}
+    \State
+    \ForAll{$word \in words$}
+      \ForAll{$(id, scores) \in groups$}
+        \If{$word \in scores$}
+          \State $w \gets $ \Call{Get}{$scores$, $word$}
+        \Else
+          \State $w \gets 0$
+        \EndIf
+
+        \State \Call{Increment}{$P$, $id$, $w$}
+        \State $k \gets $ \Call{WeightUpdate}{$w$}
+        \State \Call{Increment}{$scores$, $word$, $k$}
+      \EndFor
+    \EndFor
+    \State
+    \State $id \gets $ \Call{MaxInDict}{$P$}
+    \State $v \gets $ \Call{Get}{$P$, $id$}
+    \If{$v > S$}
+      \State \Return $id$
+    \Else
+      \State \Return \textbf{null}
+    \EndIf
+  \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+L'algoritmo \ref{alg:weight-update} rappresenta invece come vengono aggiornati i pesi nei gruppi:
+\begin{enumerate}
+  \item se il peso esistente è alto, significa che vogliamo associare la parola al gruppo, quindi viene aumentato;
+  \item se il peso esistente è piccolo, lo si aumenta di poco, per diminuire la possibilità di falsi positivi;
+  \item se il peso è invece negativo, allora si penalizza ancora di più.
+\end{enumerate}
+
+In questo algoritmo, $K_1$ rappresenta un numero positivo maggiore di $1$, $K_2$ è un valore positivo compreso
+tra $0$ e $1$ e $K_3$ è un numero negativo. Questi numeri saranno tarati su base di prove sperimentali.
+
+All'inizio i pesi possono essere tutti nulli, oppure l'azienda ha la possibilità di impostarne alcuni manualmente.
+Ad esempio, per un ipotetico gruppo di operatori che si occupano di un'applicazione mobile, si potrebbe assegnare un peso
+alto alla parola ``mobile'' oppure ``app''.
+
+\begin{algorithm}
+  \caption{Calcolo del termine di aggiornamento di un peso}\label{alg:weight-update}
+  \begin{algorithmic}[1]
+    \Function{WeightUpdate}{$x$}
+      \If{$x > 1$}
+        \State \Return $K_1$
+      \ElsIf{$x \ge 0$}
+        \State \Return $K_2$
+      \Else
+        \State \Return $K_3$
+      \EndIf
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+L'algoritmo \ref{alg:max-in-dict} è invece la ricerca della chiave con il valore massimo in un dizionario.
+Abbiamo supposto che sia possibile accedere all'elenco delle chiavi di un dizionario per
+poterle analizzare una ad una.
+
+\begin{algorithm}
+  \caption{Ottenimento della chiave con il valore massimo in un dizionario}\label{alg:max-in-dict}
+  \begin{algorithmic}[1]
+    \Function{MaxInDict}{$h$}
+      \State $v_{max} \gets $ \textbf{null}
+      \State $k_{max} \gets $ \textbf{null}
+      \ForAll{$k \in h$}
+        \State $v \gets $ \Call{Get}{$h$, $k$}
+        \If{$v_{max} =$ \textbf{null} $\vee\ v > v_{max}$}
+          \State $v_{max} \gets v$
+          \State $k_{max} \gets k$
+        \EndIf
+      \EndFor
+
+      \State \Return $k_{max}$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+Infine, l'algoritmo \ref{alg:ticket-time-estimate} racchiude i passi base per la stima del tempo
+di risoluzione di un ticket. Dato un elenco di ticket passati, l'algoritmo calcola prima tutte gli
+intervalli di tempo per cui dei ticket sono stati aperti. A questo punto, viene stimato un modello
+ARIMA su queste differenze e poi, grazie ai coefficienti trovati, viene effettuata una predizione.
+
+\begin{algorithm}
+  \caption{Stima tempo di risoluzione}\label{alg:ticket-time-estimate}
+  \begin{algorithmic}[1]
+  \Function{EstimateTime}{$tickets$}
+    \State $times \gets \emptyset$ \Comment{Lista vuota}
+    \ForAll{$t \in tickets$}
+      \If{\Call{Stato}{$t$} $=$ `Chiuso'}
+        \State $\Delta t \gets$ \Call{Fine}{$t$} $-$ \Call{Inizio}{$t$}
+        \State \Call{Push}{$tickets$, $\Delta t$}
+      \EndIf
+    \EndFor
+    \State $coefs \gets$ \Call{FitArima}{$times$}
+    \State $p \gets $ \Call{Predict}{$coefs$, $times$}
+    \State \Return $p$
+  \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+\section{Analisi di complessità}
+
+\subsection{Classificazione ticket}
+
+Per l'assegnazione del ticket in un gruppo, è necessario prendere in considerazione la dimensione
+degli input.
+
+Poniamo quindi $n$ il numero di parole contenute nel titolo e nella descrizione del ticket e $m$ il numero
+di gruppi pre-esistenti.
+
+Possiamo anche supporre che $k$ sia il numero di caratteri complessivi del ticket (compresi sia nel titolo sia
+nella descrizione).
+In questo caso l'\textbf{estrazione delle parole} si compone di due fasi:
+\begin{enumerate}
+  \item la suddivisione del testo in parole con rimozione dei caratteri non alfabetici;
+  \item la conversione in minuscolo di ogni parola.
+\end{enumerate}
+
+Integralmente la stringa composta dall'accostamento di titolo e descrizione dev'essere attraversata due volte:
+la prima per l'esecuzione dell'espressione regolare e la seconda per la conversione in minuscolo.
+Di conseguenza la complessità dei passi eseguiti per l'ottenimento delle parole risulta essere
+\begin{equation*}
+  O(2k) = O(k)
+\end{equation*}
+
+Inoltre, poiché $k \propto n$, si ha che la complessità può essere espressa in termini sia di $k$ sia di $n$, tenendo
+conto che, in un numero significativo dei casi, $k \gg n$. Noi la esprimeremo in funzione di $n$.
+
+Il prossimo passo nell'algoritmo consiste nei due \textbf{cicli annidati}. Si ha che
+\begin{itemize}
+  \item il ciclo più esterno viene eseguito esattamente $n$ volte, una volta per parola;
+  \item il ciclo più interno viene eseguito $m$ volte per ogni parola.
+\end{itemize}
+
+Bisogna quindi stimare il corpo del ciclo interno. Supponendo di usare una struttura dati dizionario
+con tempi di accesso, aggiunta, modifica e lookup delle \textit{chiavi} pari a $O(1)$, è facile notare che:
+\begin{itemize}
+  \item la funzione \texttt{Increment} è $O(1)$ per via dell'uso di questa struttura;
+  \item la funzione \texttt{WeightUpdate} è $O(1)$ poiché non dipende in alcun modo dalla dimensione dati in input.
+\end{itemize}
+
+Ne consegue quindi che il corpo del ciclo interno è a sua volta $O(1)$.
+Quindi il tempo dei due cicli annidati è complessivamente
+\begin{equation*}
+  \Theta(nm)
+\end{equation*}
+
+Infine, la \textbf{ricerca del gruppo con il punteggio massimo}. Come è possibile intuire dallo
+pseudocodice nell'algoritmo \ref{alg:max-in-dict}, bisogna analizzare ogni gruppo una volta.
+Il ciclo viene quindi eseguito $m$ volte, e con un corpo con complessità $O(1)$ risulta che quest'ultima
+operazione ha complessità
+\begin{equation*}
+  \Theta(m)
+\end{equation*}
+
+Le ultime azioni (righe 19-24) hanno invece complessità costante.
+
+Quindi, per riassumere
+\begin{equation*}
+  \begin{cases}
+    O(n) & \text{separazione delle parole} \\
+    \Theta(nm) & \text{costruzione dei punteggi} \\
+    \Theta(m) & \text{ricerca del massimo}
+  \end{cases}
+  \implies
+  O(n + nm + m) \text{ complessità totale}
+\end{equation*}
+
+\subsection{Stima ARIMA del tempo di esecuzione}
+
+La complessità di questo algoritmo verrà calcolata in base al numero $n$ di ticket usati per la stima.
+
+Il \textbf{calcolo dei tempi} in cui ogni ticket è stato aperto ha complessità $O(1)$ e viene eseguito esattamente
+$n$ volte. Inoltre, si suppone che l'ottenimento della data di apertura e della data di chiusura di un
+ticket siano operazioni $O(1)$.
+Di conseguenza, il calcolo iniziale dei tempi risulta essere
+\begin{equation*}
+  \Theta(n)
+\end{equation*}
+
+La \textbf{stima dei coefficienti} è il prossimo passo.
+Seppur lasciata ad una libreria esterna, questa utilizza il metodo della \textit{MLE} tramite \textit{innovazioni}
+con un algoritmo di \textit{gradient descent}.
+Questo tipo di algoritmo dipende da due dati: il numero $n$ di dati in ingresso, dei quali sarà calcolato
+il gradiente, ed un numero $p$ di regressori usati. Inoltre, questo tipo di algoritmo ha prestazioni che possono
+variare fortemente in base al problema preso in considerazione.
+
+Per i nostri scopi, è lecito supporre che $p \ll n$ e che l'operazione di gradiente sia dipendente
+linearmente da $n$, quindi la complessità risulta
+\begin{equation*}
+  O(n)
+\end{equation*}
+
+Infine, la \textbf{predizione} è semplicemente una combinazione lineare tra i $p$ coefficienti stimati e gli
+ultimi $p$ tempi di risoluzione. Poiché abbiamo supposto $p \ll n$, questa operazione è effettivamente $O(1)$,
+ma anche togliendo questa supposizione si ha complessità pari a $\Theta(n)$ nel caso peggiore.
+
+In conclusione
+\begin{equation*}
+  \begin{cases}
+    \Theta(n) & \text{calcolo dei tempi} \\
+    O(n) & \text{stima} \\
+    O(1) & \text{predizione}
+  \end{cases}
+  \implies
+  O(n) \text{ complessità totale}
+\end{equation*}
