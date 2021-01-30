@@ -20,12 +20,13 @@ I passi base di \textit{k-means} sono:
 La ``distanza'' è intesa in modo astratto, in quanto rappresenta solamente quanto due elementi sono vicini
 in base alle \textit{feature} scelte, non necessariamente una distanza geografica.
 
-Nel nostro caso questi gruppi sono creati a priori, poiché devono necessariamente riflettere la
-situazione reale pre-esistente nell'azienda che utilizza il prodotto.
+Nel contesto in esame i gruppi sono creati a priori, poiché devono necessariamente riflettere l'organigramma
+aziendale.
 
-Inoltre, i ticket in un'azienda sono mantenuti idealmente per un tempo indefinito, quindi possono aumentare
-molto di numero con l'avanzare del tempo. Per questo motivo, abbiamo pensato di ottimizzare l'algoritmo
-introducendo strutture dati aggiuntive sui gruppi che racchiudono una sintesi delle feature dei ticket
+Inoltre, il ciclo di vita di un ticket prevede che esso mantenga una forma di persistenza nel sistema per un tempo
+indefinito anche dopo la sua chiusura, aumentando monotonicamente il numero complessivo di essi nel corso del tempo.
+Per questo motivo, abbiamo deciso di ottimizzare l'algoritmo
+introducendo strutture dati di supporto sui gruppi che racchiudono una sintesi delle feature dei ticket
 appartenenti al gruppo stesso.
 Queste strutture dati sono poi aggiornate ad ogni assegnamento di un nuovo ticket.
 
@@ -37,8 +38,8 @@ Le parole non sono tutte quelle della lingua italiana, ma devono soddisfare alme
 \end{enumerate}
 
 Grazie a questa ottimizzazione è quindi possibile evitare di analizzare un numero elevato di ticket
-rendendo l'algoritmo adatto all'uso \textit{on-the-fly}, al momento della creazione stessa del ticket.
-Così facendo l'integrazione con il codice già esistente risulta semplificata e non c'è bisogno di
+permettendo all'algoritmo di operare in una modalità \textit{just in time}, al momento della creazione stessa del ticket.
+Così facendo l'integrazione con il codice già esistente risulta semplificata e non è necessario
 richiedere un'azione esterna al sistema.
 
 I passi base del nostro algoritmo sono:
@@ -52,10 +53,10 @@ I passi base del nostro algoritmo sono:
 
 È presente un'ulteriore funzionalità: \textit{la stima del tempo di risoluzione}.
 Dopo che un ticket viene assegnato ad un gruppo, è possibile basarsi sugli ultimi $x$ ticket chiusi per poter
-stimare in quanto tempo il problema riscontrato dal ticket sarà risolto.
-È stato preso un numero finito di ticket sia per motivi di ottimizzazione della stima di un modello stocastico,
-sia per evitare che dati troppo vecchi, che magari rispecchiano una diversa e meno performante struttura dell'azienda,
-vengano presi in considerazione.
+stimare in quanto tempo il ticket verrà chiuso la prima volta.
+È stato considerato un numero finito di ticket sia per motivi di ottimizzazione della stima di un modello stocastico,
+sia per evitare che dati troppo vecchi, che potrebbero potenzialmente rispecchiare una diversa e meno 
+performante struttura dell'azienda, vengano presi in influsicano nel calcolo.
 
 \section{Flowchart}
 
@@ -232,13 +233,13 @@ Possiamo anche supporre che $k$ sia il numero di caratteri complessivi del ticke
 nella descrizione).
 In questo caso l'\textbf{estrazione delle parole} si compone di due fasi:
 \begin{enumerate}
-  \item lo splitting delle parole con rimozione dei caratteri non alfabetici;
-  \item la trasformazione in \textit{lower case} di ogni parola.
+  \item la suddivisione del testo in parole con rimozione dei caratteri non alfabetici;
+  \item la conversione in minuscolo di ogni parola.
 \end{enumerate}
 
-In tutto quindi la stringa composta dall'accostamento di titolo e descrizione dev'essere attraversata due volte:
-la prima per l'esecuzione della regex e la seconda per la trasformazione in minuscolo.
-Di conseguenza la complessità per l'ottenimento delle parole risulta essere
+Integralmente la stringa composta dall'accostamento di titolo e descrizione dev'essere attraversata due volte:
+la prima per l'esecuzione dell'espressione regolare e la seconda per la conversione in minuscolo.
+Di conseguenza la complessità dei passi eseguiti per l'ottenimento delle parole risulta essere
 \begin{equation*}
   O(2k) = O(k)
 \end{equation*}
