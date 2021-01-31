@@ -21,7 +21,7 @@ def assign_group_to_ticket(ticket, groups, threshold):
         - `groups`: lista di tuple (id, scores), con id una chiave primaria e scores un dizionario { [string]: double }
         - `threshold`: soglia minima per il punteggio
 
-        ### Valore ritornato
+        ### Valore restituito
         Una tupla con
         - l'id del gruppo scelto
         - l'elenco dei gruppi con gli scores aggiornati

@@ -3,6 +3,7 @@
 """
 
 import json
+import ticketclassfier as tcl
 
 from django.contrib.auth import authenticate, login, logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -301,6 +302,8 @@ def handle_ticket(request, pk):
     if request.method == 'GET':
         try:
             ticket = model_to_dict(Ticket.objects.get(pk=pk))
+            time_est = tcl.estimate_time(
+                list(Ticket.objects.filter(group=ticket['group'])))
 
             comments = list(
                 map(model_to_dict, Comment.objects.filter(ticket=pk)))
@@ -314,6 +317,7 @@ def handle_ticket(request, pk):
                 'status': ticket['status'],
                 'group': ticket['group'],
                 'comments': comments,
+                'time': time_est,
             })
         except Ticket.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
