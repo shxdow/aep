@@ -31,7 +31,7 @@ def assign_group_to_ticket(ticket, groups, threshold):
 
     for word in words:
         for (gid, scores) in groups:
-            point = scores[word] if word in scores else 0
+            point = scores[word] if scores is not None and word in scores else 0
             increment(points, gid, point)
             increment(scores, word, weight_update(point))
 
@@ -52,6 +52,7 @@ def increment(dic, key, val):
     if key in dic:
         dic[key] += val
     else:
+        print(dic)
         dic[key] = val
 
 

@@ -29,7 +29,6 @@ class GroupTestCase(TestCase):
     """
         Test cases for groups
     """
-
     def setUp(self):
         self.factory = RequestFactory()
         self.user = User.objects.create_superuser(username='name',
@@ -63,7 +62,7 @@ class GroupTestCase(TestCase):
         request = self.factory.put('/group/1/', {
             "description": "changed",
         },
-            content_type="application/json")
+                                   content_type="application/json")
         request.user = self.user
         response = handle_group(request, 1)
         self.assertEqual(response.status_code, 200)
@@ -72,12 +71,11 @@ class GroupTestCase(TestCase):
         """
             Tests the failure of the creatation of a group
         """
-        request = self.factory.post(
-            '/group/add/', {
-                "wrong param":
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius",
-            },
-            content_type="application/json")
+        request = self.factory.post('/group/add/', {
+            "wrong param":
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius",
+        },
+                                    content_type="application/json")
 
         request.user = self.user
         response = add_group(request)
@@ -87,12 +85,11 @@ class GroupTestCase(TestCase):
         """
             Tests the create of a group
         """
-        request = self.factory.post(
-            '/group/add/', {
-                "description":
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius",
-            },
-            content_type="application/json")
+        request = self.factory.post('/group/add/', {
+            "description":
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eius",
+        },
+                                    content_type="application/json")
 
         request.user = self.user
         response = add_group(request)
@@ -121,7 +118,6 @@ class ClientTestCase(TestCase):
     """
         Test cases for clients
     """
-
     def setUp(self):
 
         self.factory = RequestFactory()
@@ -176,10 +172,12 @@ class ClientTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_put_client(self):
-        request = self.factory.put('/client/1/',
-                                   {
-                                       "account": {'id': 1, 'email': 'changed@ma.il'},
-                                   },
+        request = self.factory.put('/client/1/', {
+            "account": {
+                'id': 1,
+                'email': 'changed@ma.il'
+            },
+        },
                                    content_type='application/json')
         request.user = self.user
         response = handle_client(request, 1)
@@ -193,7 +191,8 @@ class ClientTestCase(TestCase):
         request = self.factory.post('/client/add/', {
             "username": "op",
             "password": "psw"
-        }, content_type="application/json")
+        },
+                                    content_type="application/json")
 
         request.user = self.user
         response = add_client(request)
@@ -207,7 +206,8 @@ class ClientTestCase(TestCase):
         request = self.factory.post('/client/add', {
             "noparam": "op",
             "password": "psw"
-        }, content_type="application/json")
+        },
+                                    content_type="application/json")
 
         request.user = self.user
         response = add_client(request)
@@ -218,7 +218,6 @@ class OperatorTestCase(TestCase):
     """
         Test cases for operators
     """
-
     def setUp(self):
         self.factory = RequestFactory()
         self.user = User.objects.create_superuser(username='us',
@@ -283,7 +282,7 @@ class OperatorTestCase(TestCase):
             },
             "group": None
         },
-            content_type='application/json')
+                                   content_type='application/json')
 
         request.user = self.user
         response = handle_operator(request, 1)
@@ -297,7 +296,8 @@ class OperatorTestCase(TestCase):
         request = self.factory.post('/operator/add', {
             "username": "op",
             "password": "psw"
-        }, content_type="application/json")
+        },
+                                    content_type="application/json")
 
         request.user = self.user
         request.user.is_superuser = True
@@ -312,7 +312,8 @@ class OperatorTestCase(TestCase):
         request = self.factory.post('/operator/add', {
             "noparam": "op",
             "password": "psw"
-        }, content_type="application/json")
+        },
+                                    content_type="application/json")
 
         request.user = self.user
         response = add_operator(request)
@@ -323,7 +324,6 @@ class TicketTestCase(TestCase):
     """
         Test cases for tickets
     """
-
     def setUp(self):
 
         self.factory = RequestFactory()
@@ -335,9 +335,15 @@ class TicketTestCase(TestCase):
         self.client = Client(account=self.acc)
         self.client.save()
 
-        self.ticket = Ticket(
-            title='Title', description='Description', client=self.client)
+        self.ticket = Ticket(title='Title',
+                             description='Description',
+                             client=self.client)
         self.ticket.save()
+
+        self.group = Group.objects.create(description="desc")
+        self.group.save()
+        self.group2 = Group.objects.create(description="desc2")
+        self.group2.save()
 
     def test_get_all_tickets(self):
         request = self.factory.patch('/tickets')
@@ -365,14 +371,15 @@ class TicketTestCase(TestCase):
 
     def test_add_ticket(self):
         """
-            Test the creation of a client
+            Test the creation of a ticket
         """
 
         request = self.factory.post('/ticket/add/', {
             "title": "Title",
             "description": "Description",
             "client": self.client.id,
-        }, content_type="application/json")
+        },
+                                    content_type="application/json")
 
         request.user = self.user
         response = add_ticket(request)
@@ -383,8 +390,8 @@ class TicketTestCase(TestCase):
             Test the create of an client
         """
 
-        request = self.factory.post(
-            '/ticket/add', {}, content_type="application/json")
+        request = self.factory.post('/ticket/add', {},
+                                    content_type="application/json")
 
         request.user = self.user
         response = add_client(request)
@@ -411,11 +418,7 @@ class TicketClassifierTestCase(TestCase):
         assert words == ['hello', 'there', 'this', 'is', 'the', 'ticket']
 
     def test_max_in_dict(self):
-        assert max_in_dict({
-            'a': 1,
-            'b': 2,
-            'c': -3
-        }) == 'b'
+        assert max_in_dict({'a': 1, 'b': 2, 'c': -3}) == 'b'
         assert max_in_dict({}) is None
         assert max_in_dict({1: 7.1, 2: 0.1}) == 1
 
@@ -430,18 +433,15 @@ class TicketClassifierTestCase(TestCase):
             'title': 'Non riesco a fare il login al portale',
             'description': 'Ho provato di tutto ma non mi accetta la password'
         }
-        groups = [
-            (1, {
-                'portale': 5,
-                'login': 1,
-                'password': 1
-            }),
-            (2, {
-                'app': 3,
-                'mobile': 2,
-                'telefono': 0.3
-            })
-        ]
+        groups = [(1, {
+            'portale': 5,
+            'login': 1,
+            'password': 1
+        }), (2, {
+            'app': 3,
+            'mobile': 2,
+            'telefono': 0.3
+        })]
 
         gid = assign_group_to_ticket(ticket, groups, 6)
         assert gid == 1
