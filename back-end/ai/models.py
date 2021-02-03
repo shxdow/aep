@@ -1,9 +1,10 @@
-"""
+""",
     This model contains the models
 """
 
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import datetime, timedelta
 
 
 class Group(models.Model):
@@ -11,6 +12,7 @@ class Group(models.Model):
         Group models
     """
     description = models.TextField()
+    scores = models.JSONField(default=dict)
 
 
 class Account(models.Model):
@@ -45,6 +47,7 @@ class Ticket(models.Model):
             - Triaged
             - Progress
     """
+    readonly_fields = ('inizio', 'fine')
 
     OPEN = 'OP'
     CLOSED = 'CL'
@@ -64,6 +67,8 @@ class Ticket(models.Model):
                               default=OPEN)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    inizio = models.DateTimeField(default=datetime.today())
+    fine = models.DateTimeField(default=datetime.today() + timedelta(days=1))
 
 
 class Operator(models.Model):
