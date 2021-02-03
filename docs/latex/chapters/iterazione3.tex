@@ -136,9 +136,9 @@ di aver trovato una vera appartenenza.
     \State $id \gets $ \Call{MaxInDict}{$P$}
     \State $v \gets $ \Call{Get}{$P$, $id$}
     \If{$v > S$}
-      \State \Return $id$
+      \State \Return ($id$, $groups$)
     \Else
-      \State \Return \textbf{null}
+      \State \Return (\textbf{null}, $groups$)
     \EndIf
   \EndFunction
   \end{algorithmic}
