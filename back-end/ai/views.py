@@ -145,16 +145,15 @@ def add_ticket(request):
             description=request.POST["description"],
             client=Client.objects.get(pk=request.POST["client"]))
 
-        grps = [x for x in Group.objects.all().values()]
-        print(grps)
-        builder = lambda g: {g['id']: json.load(g['scores'])}
-        gr = list(map(builder, grps))
-        print(gr)
-        thresh = 3
-        guessed_group = assign_group_to_ticket(model_to_dict(ticket), gr,
-                                               thresh)
+        def builder(g):
+            return (g['id'], g['scores'])
 
-        ticket['group'] = guessed_group
+        gr = list(map(builder, Group.objects.all().values()))
+        thresh = 3
+        guessed_group, group_scores = assign_group_to_ticket(model_to_dict(ticket), gr,
+                                                             thresh)
+
+        ticket.group = guessed_group
 
         ticket.save()
     except BaseException as e:

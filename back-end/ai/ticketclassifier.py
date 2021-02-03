@@ -4,6 +4,7 @@
 """
 
 import re
+import copy
 from datetime import timedelta
 from statsmodels.tsa.arima.model import ARIMA
 
@@ -28,15 +29,16 @@ def assign_group_to_ticket(ticket, groups, threshold):
     """
     points = {}
     words = extract_words(ticket)
+    new_groups = copy.deepcopy(groups)
 
     for word in words:
-        for (gid, scores) in groups:
+        for (gid, scores) in new_groups:
             point = scores[word] if scores is not None and word in scores else 0
             increment(points, gid, point)
             increment(scores, word, weight_update(point))
 
     gid = max_in_dict(points)
-    return gid if points[gid] > threshold else None
+    return (gid if points[gid] > threshold else None), new_groups
 
 
 def increment(dic, key, val):
@@ -52,7 +54,6 @@ def increment(dic, key, val):
     if key in dic:
         dic[key] += val
     else:
-        print(dic)
         dic[key] = val
 
 
