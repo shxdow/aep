@@ -66,6 +66,12 @@ const TicketInfoGraphics = ({
                 <div className="ticket-info-content">{ticketInfo?.group || 'Nessuno'}</div>
               </div>
               <div className="ticket-info">
+                <div className="ticket-info-label">Tempo di chiusura stimato</div>
+                <div className="ticket-info-content">
+                  {ticketInfo?.time > 0 ? `${ticketInfo.time / (3600 * 24)} giorni` : 'Nessuno'}
+                </div>
+              </div>
+              <div className="ticket-info">
                 <div className="ticket-info-label">Stato</div>
                 {isClient
                   ? (
