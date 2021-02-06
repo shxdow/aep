@@ -4,8 +4,6 @@ python:
 install:
   - cd back-end
   - pip install -r requirements.txt
-  - django-admin.py startproject ticket
-  - python manage.py startapp ai
   - python manage.py migrate
 script:
   - python manage.py test ai
