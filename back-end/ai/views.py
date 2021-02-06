@@ -3,6 +3,7 @@
 """
 
 import json
+from .ticketclassifier import increment, extract_words, max_in_dict, weight_update, assign_group_to_ticket, K1, K2, K3, estimate_time
 
 from django.contrib.auth import authenticate, login, logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -138,13 +139,25 @@ def add_ticket(request):
     """
     try:
         request.POST = decode_json_body(request)
+
         ticket = Ticket.objects.create(
             title=request.POST["title"],
             description=request.POST["description"],
             client=Client.objects.get(pk=request.POST["client"]))
 
+        def builder(g):
+            return (g['id'], g['scores'])
+
+        gr = list(map(builder, Group.objects.all().values()))
+        thresh = 3
+        guessed_group, group_scores = assign_group_to_ticket(model_to_dict(ticket), gr,
+                                                             thresh)
+
+        ticket.group = guessed_group
+
         ticket.save()
-    except:
+    except BaseException as e:
+        print("excp: {}".format(e))
         return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return HttpResponse(status=status.HTTP_201_CREATED)
 
@@ -301,6 +314,15 @@ def handle_ticket(request, pk):
     if request.method == 'GET':
         try:
             ticket = model_to_dict(Ticket.objects.get(pk=pk))
+            tickets = Ticket.objects.filter(group=ticket['group']).values()
+
+            if len(tickets) > 10:
+                time_est = estimate_time([{
+                    'inizio': ticket['inizio'].date(),
+                    'fine': ticket['fine'].date()
+                } for ticket in tickets])
+            else:
+                time_est = -1
 
             comments = list(
                 map(model_to_dict, Comment.objects.filter(ticket=pk)))
@@ -314,6 +336,7 @@ def handle_ticket(request, pk):
                 'status': ticket['status'],
                 'group': ticket['group'],
                 'comments': comments,
+                'time': time_est,
             })
         except Ticket.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)

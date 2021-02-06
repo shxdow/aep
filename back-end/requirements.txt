@@ -4,3 +4,4 @@ django-cors-headers
 django-extensions
 pylint
 pylint-django
+statsmodels
