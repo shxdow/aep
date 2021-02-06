@@ -1,7 +1,19 @@
-const { app, BrowserWindow } = require('electron');
+const { app, protocol, BrowserWindow } = require('electron');
+const url = require('url');
+const path = require('path');
+
+let mainWindow = null;
+
+protocol.registerSchemesAsPrivileged([{
+  scheme: 'app',
+  privileges: {
+    standard: true,
+    secure: true,
+  },
+}]);
 
 const createWindow = () => {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1200,
     minWidth: 800,
     height: 800,
@@ -11,7 +23,11 @@ const createWindow = () => {
     },
   });
 
-  win.loadURL('http://localhost:3000');
+  mainWindow.loadURL(url.format({
+    path: path.join(__dirname, 'build', 'index.html'),
+    protocol: 'file:',
+    slashes: true,
+  }));
 };
 
 app.on('ready', createWindow);
@@ -23,7 +39,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
+  if (mainWindow == null) {
     createWindow();
   }
 });
