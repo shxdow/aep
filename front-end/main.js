@@ -1,16 +1,11 @@
-const { app, protocol, BrowserWindow } = require('electron');
-const url = require('url');
+require('./src/secrets');
+
+const { app, BrowserWindow, session } = require('electron');
 const path = require('path');
 
-let mainWindow = null;
+const cookies = require('./electronCookies');
 
-protocol.registerSchemesAsPrivileged([{
-  scheme: 'app',
-  privileges: {
-    standard: true,
-    secure: true,
-  },
-}]);
+let mainWindow = null;
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
@@ -23,14 +18,44 @@ const createWindow = () => {
     },
   });
 
-  mainWindow.loadURL(url.format({
-    path: path.join(__dirname, 'build', 'index.html'),
-    protocol: 'file:',
-    slashes: true,
-  }));
+  mainWindow.loadFile(path.join(__dirname, 'build', 'index.html'));
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 };
 
-app.on('ready', createWindow);
+const saveCookiesOnIncomingRequests = (details, callback) => {
+  const { responseHeaders: headers } = details;
+  if (headers['Set-Cookie']) {
+    cookies.parseFromHeader(headers['Set-Cookie']);
+  }
+  callback(details);
+};
+
+const addCookiesToHeaders = (details, callback) => {
+  const newDetails = { ...details };
+  const isXhr = details.resourceType === 'xhr';
+  const goingToTheServer = details.url.startsWith(global.SERVER_ADDRESS);
+
+  if (isXhr && goingToTheServer) {
+    newDetails.requestHeaders = {
+      ...newDetails.requestHeaders,
+      ...(details.method !== 'GET'
+        ? { 'x-csrftoken': cookies.get('csrftoken') }
+        : {}),
+      cookie: cookies.stringify(),
+    };
+  }
+  callback(newDetails);
+};
+
+app.on('ready', () => {
+  const { webRequest } = session.defaultSession;
+  webRequest.onBeforeSendHeaders(addCookiesToHeaders);
+  webRequest.onHeadersReceived(saveCookiesOnIncomingRequests);
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
