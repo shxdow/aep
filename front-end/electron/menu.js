@@ -1,5 +1,4 @@
-require('../src/secrets');
-
+// eslint-disable-next-line
 const { app, Menu, shell } = require('electron');
 
 const isMac = process.platform === 'darwin';
@@ -87,7 +86,7 @@ const template = [
     submenu: [{
       label: 'Web Version',
       click: async () => {
-        await shell.openExternal(global.ELECTRON_PRODUCTION_SPA_ADDRESS);
+        await shell.openExternal('http://localhost:3000');
       },
     }],
   },

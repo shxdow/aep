@@ -1,11 +1,11 @@
-require('./src/secrets');
-
 // eslint-disable-next-line
 const { app, BrowserWindow, Menu, session } = require('electron');
 const path = require('path');
 
 const cookies = require('./electron/cookies');
 const menu = require('./electron/menu');
+
+const PRODUCTION_SERVER_ADDRESS = 'http:///localhost:8000';
 
 let mainWindow = null;
 
@@ -40,7 +40,7 @@ const saveCookiesOnIncomingRequests = (details, callback) => {
 const addCookiesToHeaders = (details, callback) => {
   const newDetails = { ...details };
   const isXhr = details.resourceType === 'xhr';
-  const goingToTheServer = details.url.startsWith(global.SERVER_ADDRESS);
+  const goingToTheServer = details.url.startsWith(PRODUCTION_SERVER_ADDRESS);
 
   if (isXhr && goingToTheServer) {
     newDetails.requestHeaders = {
@@ -58,8 +58,9 @@ app.on('ready', () => {
   const { webRequest } = session.defaultSession;
   webRequest.onBeforeSendHeaders(addCookiesToHeaders);
   webRequest.onHeadersReceived(saveCookiesOnIncomingRequests);
-  createWindow();
 });
+
+app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -68,7 +69,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  if (mainWindow == null) {
+  if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
 });

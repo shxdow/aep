@@ -43,5 +43,8 @@ il report nella cartella `linting`.
 Creare nella cartella `src` un file `secrets.js` con il seguente formato.
 ```
 global.SERVER_ADDRESS = 'http://your.server.com:port'
-global.ELECTRON_PRODUCTION_SPA_ADDRESS = 'http://production.website.com:port'
 ```
+
+## Compilazione per electron
+
+Per compilare per electron lanciare il comando `yarn electron-build`.

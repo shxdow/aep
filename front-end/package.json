@@ -39,7 +39,6 @@
   },
   "scripts": {
     "electron": "electron .",
-    "preelectron-build": "yarn build",
     "electron-build": "electron-builder build -mwl",
     "start": "craco start",
     "build": "craco build",
@@ -87,7 +86,8 @@
       "./main.js",
       "./package.json",
       "build/**/*",
-      "resosurces/**/*",
+      "assets/**/*",
+      "electron/**/*",
       "node_modules/**/*"
     ],
     "directories": {
@@ -95,14 +95,17 @@
       "output": "dist"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "assets/icon.png"
     },
     "mac": {
       "target": "dmg",
+      "icon": "assets/icon.png",
       "category": "public.app-category.utilities"
     },
     "linux": {
-      "target": "deb"
+      "target": "deb",
+      "icon": "assets/icon.png"
     }
   }
 }
