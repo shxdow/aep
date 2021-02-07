@@ -1,5 +1,6 @@
 require('./src/secrets');
 
+// eslint-disable-next-line
 const { app, BrowserWindow, Menu, session } = require('electron');
 const path = require('path');
 
