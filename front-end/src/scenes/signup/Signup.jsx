@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { Card, Form, Button, Col, Alert } from 'react-bootstrap';
 
 import actions from './actions.signup';
@@ -139,6 +139,9 @@ const Signup = () => {
                         >
                           {loading ? '...' : 'Crea account'}
                         </Button>
+                        <div className="p-3 text-center">
+                          <Link to="/login">Torna al login</Link>
+                        </div>
                       </div>
                     </Form>
                   </Col>
