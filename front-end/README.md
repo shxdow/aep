@@ -18,6 +18,11 @@ La pagina si ricarica in automatico se vengono modificati dei file.
 Compila la app per la produzione nella cartella `build`.\
 La build è minificata ed i nomi dei file includono l'hash.
 
+### `yarn electron`
+
+Fa partire la app in electron usando (di default) gli artifacts compilati
+che si trovano sotto `build`.
+
 ## Code Quality
 
 ### `yarn test`
@@ -39,3 +44,7 @@ Creare nella cartella `src` un file `secrets.js` con il seguente formato.
 ```
 global.SERVER_ADDRESS = 'http://your.server.com:port'
 ```
+
+## Compilazione per electron
+
+Per compilare per electron lanciare il comando `yarn electron-build`.

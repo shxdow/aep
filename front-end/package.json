@@ -1,7 +1,13 @@
 {
   "name": "ticket-frontend",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "main": "main.js",
+  "homepage": "./",
+  "author": {
+    "name": "Bianca Crippa, Toure Pape Alpha, Michele Beretta",
+    "email": "mail@mail.com"
+  },
   "dependencies": {
     "ag-grid-community": "^24.1.0",
     "ag-grid-react": "^24.1.1",
@@ -21,6 +27,8 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "craco": "0.0.3",
+    "electron": "11.2.3",
+    "electron-builder": "22.9.1",
     "eslint": "^7.14.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-plugin-import": "^2.22.1",
@@ -30,6 +38,8 @@
     "history": "^5.0.0"
   },
   "scripts": {
+    "electron": "electron .",
+    "electron-build": "electron-builder build -mwl",
     "start": "craco start",
     "build": "craco build",
     "test": "craco test",
@@ -64,5 +74,38 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "build": {
+    "extraMetadata": {
+      "main": "./main.js"
+    },
+    "appId": "com.ai.ticketing",
+    "productName": "AI Ticketing",
+    "copyright": "Copyright © 2021 ${author}",
+    "files": [
+      "./main.js",
+      "./package.json",
+      "build/**/*",
+      "assets/**/*",
+      "electron/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "resources",
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.png",
+      "category": "public.app-category.utilities"
+    },
+    "linux": {
+      "target": "deb",
+      "icon": "assets/icon.png"
+    }
   }
 }
