@@ -1,10 +1,10 @@
-import axios from 'axios';
+import { post } from '@utils/xhr';
 
 const login = async (username, password) => {
-  const { data } = await axios.post(`${global.SERVER_ADDRESS}/v1/auth/`, {
+  const { data } = await post.noCookies('/v1/auth/', {
     username,
     password,
-  }, { withCredentials: true });
+  });
 
   sessionStorage.setItem('loggedIn', true);
   sessionStorage.setItem('username', username);

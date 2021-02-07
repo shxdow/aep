@@ -1,22 +1,16 @@
-import axios from 'axios';
-import cookies from 'js-cookie';
+import { get, post } from '@utils/xhr';
 
 const getTickets = async () => {
-  const { data } = await axios.get(`${global.SERVER_ADDRESS}/v1/tickets`, { withCredentials: true });
+  const { data } = await get('/v1/tickets');
   return data;
 };
 
 const createTicket = async (title, description) => {
-  await axios.post(
-    `${global.SERVER_ADDRESS}/v1/ticket/add/`,
-    { title, description, client: sessionStorage.getItem('client') },
-    {
-      headers: {
-        'x-csrftoken': cookies.get('csrftoken'),
-      },
-      withCredentials: true,
-    },
-  );
+  await post('/v1/ticket/add/', {
+    title,
+    description,
+    client: sessionStorage.getItem('client'),
+  });
 };
 
 export default {

@@ -1,0 +1,9 @@
+language: python
+python:
+  - "3.6"
+install:
+  - cd back-end
+  - pip install -r requirements.txt
+  - python manage.py migrate
+script:
+  - python manage.py test ai

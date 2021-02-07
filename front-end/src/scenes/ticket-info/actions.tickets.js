@@ -1,39 +1,23 @@
-import axios from 'axios';
 import moment from 'moment';
-import cookies from 'js-cookie';
+
+import { get, put, post } from '@utils/xhr';
 
 const getTicketInfo = async (id) => {
-  const { data } = await axios.get(`${global.SERVER_ADDRESS}/v1/ticket/${id}/`, { withCredentials: true });
+  const { data } = await get(`/v1/ticket/${id}/`);
   return data;
 };
 
 const changeTicketStatus = async (id, status) => {
-  await axios.put(
-    `${global.SERVER_ADDRESS}/v1/ticket/${id}/`,
-    { status },
-    {
-      headers: {
-        'x-csrftoken': cookies.get('csrftoken'),
-      },
-      withCredentials: true,
-    },
-  );
+  await put(`/v1/ticket/${id}/`, { status });
 };
 
 const createComment = async (ticket, content) => {
-  await axios.post(`${global.SERVER_ADDRESS}/v1/comment/add/`,
-    {
-      account: sessionStorage.getItem('account'),
-      ticket,
-      content,
-      timestamp: moment().format(),
-    },
-    {
-      headers: {
-        'x-csrftoken': cookies.get('csrftoken'),
-      },
-      withCredentials: true,
-    });
+  await post('/v1/comment/add/', {
+    account: sessionStorage.getItem('account'),
+    ticket,
+    content,
+    timestamp: moment().format(),
+  });
 };
 
 export default {

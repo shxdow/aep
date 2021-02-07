@@ -1,13 +1,13 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 
-import Account from './scenes/account';
-import Home from './scenes/home';
-import Login from './scenes/login';
-import NotFound from './scenes/NotFound';
-import Signup from './scenes/signup';
-import TicketInfo from './scenes/ticket-info';
-import { TicketList, TicketNew } from './scenes/tickets';
+import Account from '@scenes/account';
+import Home from '@scenes/home';
+import Login from '@scenes/login';
+import NotFound from '@scenes/NotFound';
+import Signup from '@scenes/signup';
+import TicketInfo from '@scenes/ticket-info';
+import { TicketList, TicketNew } from '@scenes/tickets';
 
 const AppRouting = ({ withAuth }) => (
   <Switch>

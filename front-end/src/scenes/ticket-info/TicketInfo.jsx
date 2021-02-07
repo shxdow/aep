@@ -2,8 +2,8 @@ import React, { useState, useCallback, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { ProgressBar } from 'react-bootstrap';
 
-import Card from '../../components/card';
-import Page from '../../components/page';
+import Card from '@components/card';
+import Page from '@components/page';
 
 import TicketInfoActionsContext from './TicketInfoActionsContext';
 
