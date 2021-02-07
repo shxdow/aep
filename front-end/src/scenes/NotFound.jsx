@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 
-import Page from '../components/page';
+import Page from '@components/page';
 
 const NotFound = () => {
   const history = useHistory();

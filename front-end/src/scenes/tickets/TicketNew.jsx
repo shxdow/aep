@@ -2,8 +2,8 @@ import React, { useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Form, Alert, Button } from 'react-bootstrap';
 
-import Card from '../../components/card';
-import Page from '../../components/page';
+import Card from '@components/card';
+import Page from '@components/page';
 
 import actions from './actions.tickets';
 import validate from './validation.tickets';

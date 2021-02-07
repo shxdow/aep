@@ -3,8 +3,8 @@ import Select from 'react-select';
 import { useParams } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
 
-import Card from '../../components/card';
-import Page from '../../components/page';
+import Card from '@components/card';
+import Page from '@components/page';
 
 import Comment from './TicketInfoComment';
 import { Status } from './constants.tickets';

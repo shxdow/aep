@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import Card from '../../components/card';
-import Page from '../../components/page';
-import Table, { Column } from '../../components/table';
+import Card from '@components/card';
+import Page from '@components/page';
+import Table, { Column } from '@components/table';
 
 import actions from './actions.tickets';
 import { Status } from './constants.tickets';

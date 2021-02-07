@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { Card, Form, Button, Col, Image, Alert } from 'react-bootstrap';
 
-import BackgroundImage from '../../resources/login.jpeg';
+import BackgroundImage from '@resources/login.jpeg';
 
 import validate from './validation.login';
 import actions from './actions.login';
