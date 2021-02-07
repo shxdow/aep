@@ -1,10 +1,10 @@
-import axios from 'axios';
+import { post } from '@utils/xhr';
 
 const signup = async (username, password) => {
-  await axios.post(`${global.SERVER_ADDRESS}/v1/signup/`, {
+  await post('/v1/signup/', {
     username,
     password,
-  }, { withCredentials: true });
+  });
 };
 
 export default { signup };
