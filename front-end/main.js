@@ -1,9 +1,10 @@
 require('./src/secrets');
 
-const { app, BrowserWindow, session } = require('electron');
+const { app, BrowserWindow, Menu, session } = require('electron');
 const path = require('path');
 
-const cookies = require('./electronCookies');
+const cookies = require('./electron/cookies');
+const menu = require('./electron/menu');
 
 let mainWindow = null;
 
@@ -23,6 +24,8 @@ const createWindow = () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+
+  Menu.setApplicationMenu(menu);
 };
 
 const saveCookiesOnIncomingRequests = (details, callback) => {
