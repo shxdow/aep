@@ -1,0 +1,123 @@
+\section{Server back-end in Python}
+
+\subsection{Prerequisiti}
+
+È necessario avere \textit{Python 3} e \textit{pip} installati.
+Tutti i comandi di seguito saranno effettuati su una shell a propria scelta (o il \textit{Command Prompt} su Windows).
+
+\subsection{Installazione delle dipendenze}
+
+Il codice Python necessita di alcune dipendenze per il corretto funzionamento.
+Al fine di isolare il codice ed il suo environment da altri possibilmente esistenti sul sistema
+operativo, è necessario attivare un \textit{virtual environment} con il comando
+\texttt{python -m venv venv}\footnote{In alcuni casi potrebbe essere necessario usare \texttt{python3}}.
+
+A questo punto, si può attivare il virtual environment con il comando
+\begin{itemize}
+  \item \texttt{source venv/bin/activate} per i sistemi Unix e Unix-like;
+  \item \texttt{venv\textbackslash bin\textbackslash activate} per Windows.
+\end{itemize}
+
+Ora è possibile installare le dipendenze, elencate nel file \texttt{requirements.txt},
+tramite il comando \texttt{pip install -r requirements.txt}.
+
+\subsection{Esecuzione}
+
+Dopo aver installato le dipendenze ed essersi posti nella cartella \texttt{back-end}, è possibile
+eseguire il server.
+Una volta attivato il virtual environment, la prima volta bisogna eseguire due
+comandi per inizializzare il database ed il superuser:
+\begin{itemize}
+  \item \texttt{python manage.py migrate}
+  \item \texttt{python manage.py createsuperuser}
+\end{itemize}
+
+Per avviare il server si usa quindi il comando \texttt{python manage.py runserver},
+che di default avvierà un processo in ascolto all'indirizzo \texttt{localhost:8080}.
+
+\subsection{Riassunto}
+
+I comandi da eseguire sono, supponendo di essere inizialmente nella root del progetto
+\begin{enumerate}
+  \item \texttt{cd back-end}
+  \item \texttt{python -m venv venv}
+  \item \texttt{source venv/bin/activate}
+  \item \texttt{pip install -r requirements.txt}
+  \item Solo al primo avvio
+    \begin{itemize}
+      \item \texttt{python manage.py migrate}
+      \item \texttt{python manage.py createsuperuser}
+    \end{itemize}
+  \item \texttt{python manage.py runserver}
+\end{enumerate}
+
+\section{Front-end in JavaScript}
+
+\subsection{Prerequisiti}
+
+È necessario avere \textit{node} e \textit{npm} installati.
+Inoltre, seppur non essenziale, è consigliato l'uso di \textit{yarn} per la gestione delle dipendenze.
+Tutti i comandi di seguito saranno effettuati su una shell a propria scelta (o il \textit{Command Prompt} su Windows).
+
+Se si vuole usare \texttt{npm} il comando per l'installazione delle dipendenze è \texttt{npm install},
+mentre per gli altri comandi basta sostituire \texttt{yarn} con \texttt{npm run}.
+
+\subsection{Installazione delle dipendenze}
+
+Le dipendenze sono gestite tramite \textit{node}.
+Per installarle bisogna porsi nella cartella \texttt{front-end} ed eseguire il comando \texttt{yarn install}.
+
+
+\subsection{Variabili di ambiente}
+
+Per il funzionamento del sito è necessario indicare qual è il server a cui inoltrare le richieste di rete.
+Questo viene fatto creando un file \texttt{secrets.js} nella cartella \texttt{src} e ponendoci il seguente contenuto.
+\begin{verbatim}
+  global.SERVER_ADDRESS = `https://addres.totheserver.com';
+\end{verbatim}
+
+\subsection{Esecuzione e compilazione del sito}
+
+Una volta installate le dipendenze, è possibile eseguire i seguenti comandi relativi al sito:
+\begin{itemize}
+  \item \texttt{yarn start} per avere un server di sviluppo all'indirizzo \texttt{localhost:3000} e che si aggiorna automaticamente ad ogni cambiamento nei file;
+  \item \texttt{yarn build} per produrre una versione compilata ed ottimizzata per la produzione
+\end{itemize}
+
+\subsection{Esecuzione e compilazione della app}
+
+Il progetto dà anche la possibilità di compilare una app con \textit{Electron}.
+Notare che questo metodo è pensato unicamente per la produzione e non per lo sviluppo,
+quindi se si desidera modificare gli indirizzi del server essi vanno cambiati sia in \texttt{main.js}
+sia in \texttt{electron/menu.js}.
+
+Per effettuare una compilazione con Electron è necessario eseguire i seguenti due comandi in serie:
+\texttt{yarn build} e \texttt{yarn electron-build}.
+
+Prestare attenzione alla compilazione con Electron: nel caso il sistema operativo utilizzato non sia macOS,
+è possibile che non sia abilitata la compilazione della app per macOS.
+In tal caso, basta rimuovere il flag \texttt{-m} dallo script \texttt{electron} nel file \texttt{front-end/package.json}.
+
+Questa compilazione produrrà i relativi eseguibili, installer e pacchetti nella cartella \texttt{dist}.
+
+\subsection{Riassunto}
+
+Di seguito sono riassunti i comandi principali per l'esecuzione e compilazione:
+\begin{enumerate}
+  \item \texttt{cd front-end}
+  \item \texttt{yarn install}
+  \item \texttt{echo ``global.SERVER\_ADDRESS = `http://server.address.com''' > src/secrets.js}
+  \item Per far partire il server
+    \begin{itemize}
+      \item \texttt{yarn start}
+    \end{itemize}
+  \item Per compilare per la produzione
+    \begin{itemize}
+      \item \texttt{yarn build}
+    \end{itemize}
+  \item Per compilare la app in Electron
+    \begin{itemize}
+      \item \texttt{yarn build}
+      \item \texttt{yarn electron-build}
+    \end{itemize}
+\end{enumerate}
