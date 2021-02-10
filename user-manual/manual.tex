@@ -1,0 +1,62 @@
+\documentclass[a4paper,12pt,openright]{report}
+
+\usepackage[T1]{fontenc}
+\usepackage[hidelinks]{hyperref}
+\usepackage[italian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{array}
+\usepackage{csquotes}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{import}
+
+\graphicspath{{./images/}}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{0.3cm}
+\renewcommand{\arraystretch}{1.2}
+\renewcommand{\baselinestretch}{1.2}
+
+% ==== REAL DOCUMENT BEGINS HERE ====
+\title{%
+  \Huge \textbf{Manuale di installazione} \\
+  \Large Informatica III - Modulo di Progettazione e Algoritmi
+}
+\author{Michele Beretta - 1054365 \\ 
+        Bianca Crippa - 1053356 \\
+        Pape Alpha Toure - 1053327
+        }
+\date{A.A. 2020/2021}
+
+\begin{document}
+  % ----- TITOLO
+  \clearpage
+  \maketitle
+  
+  % ----- EMPTY
+  \clearpage
+  \thispagestyle{plain}
+  \pagenumbering{gobble}
+  \mbox{}
+  
+  % ----- INDICE
+  \clearpage
+  \pagenumbering{Roman}
+  \tableofcontents
+
+  % ----- EMPTY
+  % \clearpage
+  % \thispagestyle{plain}
+  % \pagenumbering{gobble}
+  % \mbox{}
+
+  \clearpage
+  \pagenumbering{arabic}
+
+  \chapter{Installazione}
+  \import{chapters/}{installazione.tex}
+
+  \chapter{Compilazione del codice sorgente}
+  \import{chapters/}{compilazione.tex}
+
+\end{document}
