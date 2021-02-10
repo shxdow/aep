@@ -1,0 +1,67 @@
+\section{Continuous Integration}
+
+A questo punto dello sviluppo, avendo creato un MVP funzionante, è stato deciso di apportare miglioramenti
+all'aspetto infrastrutturale, utilizzando le idee del paradigma \textit{Continuos Integration}.
+
+Tale miglioramente è stato implementato utilizzando \textit{Travis}, un software in grado di eseguire script
+e segnalare lo stato di terminazione di tali istruzioni. Essi possono essere utilizzati per automatizzare
+l'esecuzione dei test ogni qualvolta viene aggiunto del codice al repository git di riferimento.
+
+In questo modo abbiamo semplificato di molto il ciclo di sviluppo e modifica del codice, garantendo di avere
+sempre l'esecuzione dei test senza doverli avviare manualmente.
+
+\section{Electron}
+
+Electron è una libreria JavaScript utilizzata per la creazione di applicazioni cross-platform
+tramite i linguaggi che si trovano tipicamente in ambito Web, ossia JavaScript, HTML e CSS.
+È usata in molti progetti, come ad esempio \textit{Visual Studio Code}, \textit{Twitch} desktop,
+\textit{Microsoft Teams}, \textit{Postman} e svariate altre\footnote{\url{https://www.electronjs.org/apps}}.
+
+\subsection{Integrazione con il front-end}
+
+L'integrazione con il codice front-end è stata relativamente facile.
+È stato creato un file (\texttt{main.js}) che si occupasse della gestione delle finestre dell'applicazione
+tramite le API di Electron.
+
+Inoltre, è necessario indicare quali file considerare nella creazione dei vari \textit{artifact} prodotti da
+Electron: abbiamo deciso di includere i file già compressi e ottimizzati per il web, in modo da accelerare
+le performance della applicazione.
+
+Infine, sono state anche presi in considerazione i diversi comportamenti standard che i principali sistemi
+operativi (macOS, Linux e Windows) definiscono per i propri programmi.
+Ad esempio, se il progetto viene compilato con Electron per macOS, allora la chiusura della finestra non
+determinerà la chiusura dell'applicazione, a differenza di quanto accade se compilato per Linux o Windows,
+come si può vedere nel seguente estratto del file \texttt{main.js}\footnote{Il sistema macOS è identificato dalla piattaforma `darwin'}.
+
+\begin{lstlisting}
+app.whenReady().then(createWindow);
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
+});
+\end{lstlisting}
+
+In ogni caso, oltre agli eseguibili ed alle dovute risorse, vengono compilati anche i vari installer
+per ogni piattaforma, così da garantire una maggiore facilità di installazione e condivisione.
+
+\subsection{Gestione dei cookies}
+
+L'unico problema incontrano nell'integrazione con Electron è stato nella gestione dei cookies.
+Per motivi di sicurezza, i cookie sicuri non vengono salvati sul protocollo \texttt{file}, che è quello
+usato da Electron per la gestione dei file HTML.
+
+Quindi, per garantire il corretto funzionamento, è stato implementato un piccolo modulo che si occupa di
+intercettare le richieste di rete fatte da e verso il nostro server e di aggiungere in modo trasparente
+i cookie scambiati.
+
+Questi cookie esistono solamente in memoria\footnote{Sono quindi persi alla chiusura dell'applicazione}
+e non sono mai inviati a domini diversi da quello a cui risiede il back-end, garantendo così un'adeguata
+sicurezza.
